@@ -25,10 +25,47 @@ Only checked items have been completed and verified.
 - [x] Define statistics interfaces and empty-statistics constructors.
 - [x] Define the application-settings interface.
 
+## Phase 2 - Basic Interface
+
+### 4. Create the Shared Page Layout
+
+- [x] Create the shared application shell with a branded header and semantic main-content area.
+- [x] Add responsive navigation with active-route styling for Home, Practice, Statistics, and Settings.
+- [x] Add responsive, child-friendly baseline styles and visible focus indicators.
+
+### 5. Create the Home Page
+
+- [x] Add a child-friendly welcome message.
+- [x] Add Start Practice and View Statistics actions.
+
+### 6. Add Application Routing
+
+- [x] Configure React Router routes for home, setup, practice, statistics, settings, and unknown paths.
+- [x] Add safe placeholder pages for later-phase features without implementing their functionality.
+
+## Phase 3 - Practice Configuration
+
+### 7. Create the Operation Selector
+
+- [x] Provide selectable addition, subtraction, multiplication, and division controls.
+- [x] Support selecting one or more operations, plus Select all and Clear selection actions.
+
+### 8. Create the Difficulty Selector
+
+- [x] Provide one accessible radio selection for each of the four difficulty levels.
+
+### 9. Create the Session-Length Selector
+
+- [x] Provide 5, 10, 20, and continuous-practice choices.
+
+### 10. Build the Practice Setup Page
+
+- [x] Combine all configuration selectors in a responsive form.
+- [x] Keep Start Practice disabled until operations, one difficulty, and a session length are selected.
+- [x] Hand the validated configuration to the practice route, which remains a clearly labeled Phase 7 placeholder.
+
 ## Remaining phases
 
-- [ ] Phase 2 (tasks 4-6): shared page layout, home page, and routing.
-- [ ] Phase 3 (tasks 7-10): operation/difficulty/session-length selectors and practice setup.
 - [ ] Phase 4 (tasks 11-16): validated arithmetic question utilities and generators.
 - [ ] Phase 5 (tasks 17-19): plausible distractors, unique choices, and shuffling.
 - [ ] Phase 6 (tasks 20-25): answer choice and question-card front/back, selection, flip behavior, and animation.
