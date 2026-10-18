@@ -66,9 +66,44 @@ Only checked items have been completed and verified.
 
 ## Remaining phases
 
-- [ ] Phase 4 (tasks 11-16): validated arithmetic question utilities and generators.
-- [ ] Phase 5 (tasks 17-19): plausible distractors, unique choices, and shuffling.
-- [ ] Phase 6 (tasks 20-25): answer choice and question-card front/back, selection, flip behavior, and animation.
+## Phase 4 - Basic Math Question Generation
+
+### 11. Create General Question Utilities
+
+- [x] Add random-number, shuffle, and operation-symbol utilities.
+- [x] Give generated questions IDs, display text, correct answers, difficulty, and a regular-practice source.
+
+### 12-15. Implement Arithmetic Questions
+
+- [x] Generate addition within each documented difficulty range.
+- [x] Generate subtraction without negative answers.
+- [x] Generate multiplication using the documented factor ranges.
+- [x] Generate whole-number division without division by zero.
+
+### 16. Create the Main Question Generator
+
+- [x] Create operation-specific questions and a complete-question helper that adds answer choices.
+
+## Phase 5 - Multiple-Choice Answers
+
+### 17-19. Generate and Shuffle Answer Choices
+
+- [x] Generate three unique, non-negative distractors that differ from the correct answer.
+- [x] Apply operation-specific distractor strategies for all four operations.
+- [x] Shuffle the correct answer with distractors into four choices.
+
+## Phase 6 - Question Card
+
+### 20-25. Answer Choices and Card Interaction
+
+- [x] Create accessible, selectable answer-choice controls.
+- [x] Build the question-card front with four answers and a disabled-until-selected Flip Card button.
+- [x] Show the original question, selected answer, correct answer, and right/wrong actions on the back.
+- [x] Prevent answer changes after flipping, record one self-reported result, and reset the card when its question changes.
+- [x] Add card-reveal animation with reduced-motion support and an animation-disable component prop.
+
+## Remaining phases
+
 - [ ] Phase 7 (tasks 26-31): practice-session state, results, progress, advancing, and continuous practice.
 - [ ] Phase 8 (tasks 32-34): completion detection, summary, and summary actions.
 - [ ] Phase 9 (tasks 35-39): resilient versioned local-storage service and persistence.

@@ -260,6 +260,96 @@ legend {
   width: 100%;
 }
 
+.question-card {
+  background: #fff;
+  border: 2px solid #dfe4f5;
+  border-radius: 1.5rem;
+  box-shadow: 0 16px 40px rgb(53 68 125 / 9%);
+  margin: 2rem auto;
+  max-width: 42rem;
+  min-height: 26rem;
+  padding: clamp(1.5rem, 5vw, 3rem);
+  perspective: 900px;
+}
+.question-card__face {
+  animation: card-enter 0.28s ease-out;
+  text-align: center;
+}
+.question-card--flipped .question-card__face--back {
+  animation: card-flip-in 0.35s ease-out;
+}
+.question-card--no-animation .question-card__face,
+.question-card--no-animation .question-card__face--back {
+  animation: none;
+}
+.question-card h2 {
+  font-size: clamp(2rem, 8vw, 3.5rem);
+  margin: 1rem 0 2rem;
+}
+.answer-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 1.5rem;
+}
+.answer-choice {
+  align-items: center;
+  background: #fbfcff;
+  border: 2px solid #dfe4f5;
+  border-radius: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  font-size: 1.5rem;
+  font-weight: 900;
+  justify-content: center;
+  min-height: 4.5rem;
+  padding: 0.75rem;
+}
+.answer-choice:has(input:checked),
+.answer-choice--selected {
+  background: #f0edff;
+  border-color: #6956d8;
+  color: #403281;
+}
+.answer-choice input {
+  height: 1px;
+  opacity: 0;
+  position: absolute;
+  width: 1px;
+}
+.answer-choice:has(input:focus-visible) {
+  outline: 3px solid #ffac4b;
+  outline-offset: 3px;
+}
+.result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+@keyframes card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes card-flip-in {
+  from {
+    opacity: 0;
+    transform: rotateY(-90deg);
+  }
+  to {
+    opacity: 1;
+    transform: rotateY(0);
+  }
+}
+
 :focus-visible {
   outline: 3px solid #ffac4b;
   outline-offset: 3px;
@@ -284,5 +374,18 @@ legend {
   }
   .choice-grid {
     grid-template-columns: 1fr;
+  }
+  .answer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }
