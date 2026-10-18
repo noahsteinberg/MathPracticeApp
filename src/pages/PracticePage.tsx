@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { QuestionCard } from '../components/practice/QuestionCard'
 import { createSessionQuestion } from '../services/questionGenerator'
+import { loadSettings, saveAttempt, saveSession } from '../services/storage'
 import type {
   PracticeSession,
   PracticeAttempt,
@@ -63,9 +64,14 @@ function ActivePracticeSession({
   const [, setAttempts] = useState<PracticeAttempt[]>([])
 
   const finishSession = (completedSession: PracticeSession) => {
+    const finishedSession = {
+      ...completedSession,
+      completedAt: new Date().toISOString(),
+    }
+    saveSession(finishedSession)
     const summary: SessionSummaryData = {
       setup,
-      session: { ...completedSession, completedAt: new Date().toISOString() },
+      session: finishedSession,
     }
     onComplete('/summary', { state: { summary } })
   }
@@ -85,24 +91,23 @@ function ActivePracticeSession({
     }
 
     setSession(updatedSession)
-    setAttempts((currentAttempts) => [
-      ...currentAttempts,
-      {
-        id: crypto.randomUUID(),
-        questionId: question.id,
-        operation: question.operation,
-        firstOperand: question.firstOperand,
-        secondOperand: question.secondOperand,
-        correctAnswer: question.correctAnswer,
-        selectedAnswer,
-        selfReportedCorrect,
-        difficulty: question.difficulty,
-        source: question.source,
-        attemptedAt: new Date().toISOString(),
-        sessionId: session.id,
-        mistakePatternId: question.mistakePatternId,
-      },
-    ])
+    const attempt: PracticeAttempt = {
+      id: crypto.randomUUID(),
+      questionId: question.id,
+      operation: question.operation,
+      firstOperand: question.firstOperand,
+      secondOperand: question.secondOperand,
+      correctAnswer: question.correctAnswer,
+      selectedAnswer,
+      selfReportedCorrect,
+      difficulty: question.difficulty,
+      source: question.source,
+      attemptedAt: new Date().toISOString(),
+      sessionId: session.id,
+      mistakePatternId: question.mistakePatternId,
+    }
+    setAttempts((currentAttempts) => [...currentAttempts, attempt])
+    saveAttempt(attempt)
     const isFixedSessionComplete =
       setup.sessionLength !== 'continuous' &&
       updatedSession.attemptedCount >= setup.sessionLength
@@ -161,7 +166,11 @@ function ActivePracticeSession({
           />
         )}
       </div>
-      <QuestionCard question={question} onResult={handleResult} />
+      <QuestionCard
+        question={question}
+        animationsEnabled={loadSettings().cardAnimationsEnabled}
+        onResult={handleResult}
+      />
     </section>
   )
 }

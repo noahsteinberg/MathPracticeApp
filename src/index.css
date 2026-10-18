@@ -309,6 +309,71 @@ progress {
   justify-content: center;
   margin-top: 1.75rem;
 }
+.statistics-page,
+.settings-page {
+  max-width: 58rem;
+  margin: 0 auto;
+}
+.stat-grid {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  margin: 1rem 0 2rem;
+}
+.stat-card,
+.settings-panel,
+.recent-sessions {
+  background: #fff;
+  border: 1px solid #dfe4f5;
+  border-radius: 1rem;
+  padding: 1rem;
+}
+.stat-card h2,
+.recent-sessions h2,
+.settings-panel h2 {
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem;
+}
+.stat-card p {
+  margin: 0.35rem 0;
+}
+.recent-sessions {
+  margin: 2rem 0;
+}
+.recent-sessions ul {
+  display: grid;
+  gap: 0.6rem;
+  padding-left: 1.25rem;
+}
+.settings-panel {
+  display: grid;
+  gap: 1rem;
+}
+.settings-panel label {
+  display: grid;
+  gap: 0.35rem;
+  font-weight: 700;
+}
+.settings-panel select,
+.settings-panel input[type='number'] {
+  border: 1px solid #aeb9d4;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+}
+.setting-row {
+  align-items: center;
+  display: flex !important;
+  gap: 1rem;
+  justify-content: space-between;
+}
+.setting-row input {
+  accent-color: #6956d8;
+  height: 1.2rem;
+  width: 1.2rem;
+}
+.settings-panel fieldset {
+  margin: 0;
+}
 
 .question-card {
   background: #fff;

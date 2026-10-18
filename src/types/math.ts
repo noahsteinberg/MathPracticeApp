@@ -85,6 +85,16 @@ export interface AppSettings {
   masteryThreshold: number
 }
 
+export const DEFAULT_APP_SETTINGS: AppSettings = {
+  soundEffectsEnabled: true,
+  cardAnimationsEnabled: true,
+  showExplanations: true,
+  defaultSessionLength: 10,
+  defaultDifficulty: 2,
+  defaultOperations: ['addition', 'subtraction', 'multiplication', 'division'],
+  masteryThreshold: 3,
+}
+
 export interface OperationStatistics {
   attempted: number
   correct: number

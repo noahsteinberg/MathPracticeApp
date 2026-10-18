@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { loadSettings } from '../services/storage'
 import type {
   DifficultyLevel,
   MathOperation,
@@ -50,11 +51,16 @@ const sessionLengths: Array<{ value: SessionLength; label: string }> = [
 
 export function PracticeSetupPage() {
   const navigate = useNavigate()
+  const defaults = loadSettings()
   const [selectedOperations, setSelectedOperations] = useState<MathOperation[]>(
-    [],
+    defaults.defaultOperations,
   )
-  const [difficulty, setDifficulty] = useState<DifficultyLevel | null>(null)
-  const [sessionLength, setSessionLength] = useState<SessionLength | null>(null)
+  const [difficulty, setDifficulty] = useState<DifficultyLevel | null>(
+    defaults.defaultDifficulty,
+  )
+  const [sessionLength, setSessionLength] = useState<SessionLength | null>(
+    defaults.defaultSessionLength,
+  )
 
   const toggleOperation = (operation: MathOperation) => {
     setSelectedOperations((current) =>

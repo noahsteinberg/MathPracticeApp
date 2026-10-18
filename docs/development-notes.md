@@ -22,3 +22,11 @@
 - Decision: completed attempts remain in component memory and are intentionally not written to `localStorage`; Phase 9 will add the storage service. The summary receives its data through route state.
 - Tests: full five-question session through a 100% summary and Practice Again; continuous session ended with zero attempts; confirmation when ending a continuous session with progress; no immediate repeated question signature.
 - Fixes: narrowed one progress assertion after both the session landmark and progress element correctly exposed the same accessible question label.
+
+## Phase 9-11 - Persistence, statistics, and settings
+
+- Prompt focus: persist settings/attempts/completed sessions, add statistics and reset actions, and stop before mistake tracking.
+- Decisions: storage uses an app-specific, versioned key namespace and validates every loaded record. Attempts are saved when results are recorded; completed sessions are saved only when a session finishes. Active-session recovery remains Phase 18.
+- Tests: malformed-data recovery; settings/attempt/session persistence; history reset versus clear-all; aggregate statistics; settings changes; default application to setup; statistics display and reset.
+- Fixes: replaced Node 25's file-backed test `localStorage` with a deterministic in-memory test storage shim, and made a statistics assertion target its containing card because the value is intentionally split into semantic elements.
+- Verification: `npm test` (18 passing), `npm run lint`, `npm run format:check`, and `npm run build` all pass.

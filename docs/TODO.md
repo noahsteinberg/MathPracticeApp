@@ -130,9 +130,43 @@ Only checked items have been completed and verified.
 
 ## Remaining phases
 
-- [ ] Phase 9 (tasks 35-39): resilient versioned local-storage service and persistence.
-- [ ] Phase 10 (tasks 40-47): calculations, statistics views, recent sessions, and reset.
-- [ ] Phase 11 (tasks 48-50): settings, defaults, and clear-all-data flow.
+## Phase 9 - Local Data Storage
+
+### 35-36. Storage Service and Schema Versioning
+
+- [x] Add an application-prefixed local-storage wrapper for JSON reads, writes, deletion, and storage failures.
+- [x] Recover from malformed JSON and invalid saved records without crashing.
+- [x] Store an application schema version and reserve a migration point that does not affect unrelated browser data.
+
+### 37-39. Persist Settings, Sessions, and Attempts
+
+- [x] Persist validated settings and recover to defaults when saved settings are missing or invalid.
+- [x] Save completed sessions and load recent sessions for statistics.
+- [x] Save completed attempts with selected answer, self-reported result, operation, difficulty, session ID, and timestamp.
+
+## Phase 10 - Statistics
+
+### 40-42. Statistics Calculations
+
+- [x] Calculate overall totals and zero-safe accuracy, with unit tests.
+- [x] Calculate totals and accuracy by operation and difficulty.
+
+### 43-47. Statistics Page and Reset
+
+- [x] Display overall, operation, difficulty, and recent-session statistics with responsive cards and empty states.
+- [x] Sort recent completed sessions newest first.
+- [x] Add confirmed statistics reset that clears attempts/sessions while preserving settings.
+
+## Phase 11 - Settings
+
+### 48-50. Settings, Defaults, and Clear Data
+
+- [x] Add persisted settings for sound, card animation, explanations, default session length/difficulty/operations, and mastery threshold.
+- [x] Apply saved default practice configuration to the setup page while allowing per-session changes.
+- [x] Add confirmed clear-all-data action that restores defaults and returns home.
+
+## Remaining phases
+
 - [ ] Phase 12 (tasks 51-53): mistake-pattern creation, update, and persistence.
 - [ ] Phase 13 (tasks 54-57): nearby, reversed, and fact-family similar-question generation.
 - [ ] Phase 14 (tasks 58-62): review setup, priority, review sessions, success tracking, and mastery.

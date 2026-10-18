@@ -22,14 +22,16 @@ describe('Phase 2 and 3 application flow', () => {
     )
   })
 
-  it('requires a complete setup and passes it to the practice route', async () => {
+  it('uses persisted defaults and passes setup data to the practice route', async () => {
     const user = userEvent.setup()
     render(<App />)
 
     await user.click(screen.getByRole('link', { name: 'Start practice' }))
     const startButton = screen.getByRole('button', { name: 'Start practice' })
-    expect(startButton).toBeDisabled()
+    expect(startButton).toBeEnabled()
 
+    await user.click(screen.getByRole('button', { name: 'Clear selection' }))
+    expect(startButton).toBeDisabled()
     await user.click(screen.getByLabelText('Addition'))
     await user.click(screen.getByLabelText(/Level 2: Easy/))
     await user.click(screen.getByLabelText('5 questions'))
