@@ -104,8 +104,32 @@ Only checked items have been completed and verified.
 
 ## Remaining phases
 
-- [ ] Phase 7 (tasks 26-31): practice-session state, results, progress, advancing, and continuous practice.
-- [ ] Phase 8 (tasks 32-34): completion detection, summary, and summary actions.
+## Phase 7 - Practice Session
+
+### 26-29. Session State, Results, and Advancement
+
+- [x] Create in-memory session state with an ID, setup configuration, counts, current question number, and completed attempts.
+- [x] Start from validated setup data and redirect to setup when it is unavailable.
+- [x] Record one self-reported result per card and update session totals.
+- [x] Advance automatically to a newly generated question, reset the card, and avoid immediately repeating a question.
+
+### 30-31. Progress and Continuous Practice
+
+- [x] Show accessible Question X of Y progress for fixed-length sessions.
+- [x] Hide fixed progress for continuous practice and show completed-question count instead.
+- [x] Support ending continuous practice, with confirmation after at least one attempt.
+
+## Phase 8 - Session Summary
+
+### 32-34. Completion, Summary, and Actions
+
+- [x] Complete fixed sessions at the configured length, timestamp completion, and navigate to the summary.
+- [x] Display attempted, correct, incorrect, accuracy, operations, difficulty, and mistake-review count.
+- [x] Provide Practice Again, Change Settings, View Statistics, and Return Home actions.
+- [x] Show a disabled Practice Mistakes action until mistake-review mode is implemented in Phase 14.
+
+## Remaining phases
+
 - [ ] Phase 9 (tasks 35-39): resilient versioned local-storage service and persistence.
 - [ ] Phase 10 (tasks 40-47): calculations, statistics views, recent sessions, and reset.
 - [ ] Phase 11 (tasks 48-50): settings, defaults, and clear-all-data flow.

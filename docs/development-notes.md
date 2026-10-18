@@ -15,3 +15,10 @@
 - Tests: generated-question arithmetic and bounds across every operation/difficulty, unique four-choice answers, card selection/flip/reveal behavior, one-time self-reported result handling, reset on a new question, plus the existing route/setup tests.
 - Fixes: replaced a synchronous state-reset effect (reported by lint) with a keyed card instance so new questions reset without an extra effect-driven render.
 - Verification: `npm test` (7 passing), `npm run lint`, `npm run format:check`, and `npm run build` all pass.
+
+## Phase 7-8 - Session flow and summaries
+
+- Prompt focus: implement only in-memory session flow, progress, question advancement, continuous practice, and summaries; do not begin local-storage persistence.
+- Decision: completed attempts remain in component memory and are intentionally not written to `localStorage`; Phase 9 will add the storage service. The summary receives its data through route state.
+- Tests: full five-question session through a 100% summary and Practice Again; continuous session ended with zero attempts; confirmation when ending a continuous session with progress; no immediate repeated question signature.
+- Fixes: narrowed one progress assertion after both the session landmark and progress element correctly exposed the same accessible question label.

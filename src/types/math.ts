@@ -57,6 +57,11 @@ export interface PracticeSession {
   mistakeReviewCount: number
 }
 
+export interface SessionSummaryData {
+  session: PracticeSession
+  setup: PracticeSetupConfig
+}
+
 export interface MistakePattern {
   id: string
   operation: MathOperation

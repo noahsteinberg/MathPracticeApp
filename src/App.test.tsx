@@ -32,22 +32,16 @@ describe('Phase 2 and 3 application flow', () => {
 
     await user.click(screen.getByLabelText('Addition'))
     await user.click(screen.getByLabelText(/Level 2: Easy/))
-    await user.click(screen.getByLabelText('10 questions'))
+    await user.click(screen.getByLabelText('5 questions'))
 
     expect(startButton).toBeEnabled()
     await user.click(startButton)
 
     expect(
-      screen.getByRole('heading', { name: 'Practice setup saved' }),
+      screen.getByRole('heading', { name: 'Question 1 of 5' }),
     ).toBeInTheDocument()
-    expect(screen.getByLabelText('Selected practice setup')).toHaveTextContent(
-      'addition',
-    )
-    expect(screen.getByLabelText('Selected practice setup')).toHaveTextContent(
-      'Level 2 - Easy',
-    )
-    expect(screen.getByLabelText('Selected practice setup')).toHaveTextContent(
-      '10 questions',
-    )
+    expect(
+      screen.getByRole('progressbar', { name: 'Question 1 of 5' }),
+    ).toBeInTheDocument()
   })
 })

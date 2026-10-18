@@ -117,3 +117,24 @@ export function createQuestion(
 ): Question {
   return addAnswerChoices(generateQuestion(operation, difficulty))
 }
+
+function questionSignature(question: Question): string {
+  return `${question.operation}:${question.firstOperand}:${question.secondOperand}`
+}
+
+export function createSessionQuestion(
+  operations: MathOperation[],
+  difficulty: DifficultyLevel,
+  previousQuestion?: Question,
+): Question {
+  const previousSignature =
+    previousQuestion && questionSignature(previousQuestion)
+
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+    const operation = operations[Math.floor(Math.random() * operations.length)]
+    const question = createQuestion(operation, difficulty)
+    if (questionSignature(question) !== previousSignature) return question
+  }
+
+  return createQuestion(operations[0], difficulty)
+}

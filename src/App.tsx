@@ -4,7 +4,8 @@ import { HomePage } from './pages/HomePage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { PlaceholderPage } from './pages/PlaceholderPage'
 import { PracticeSetupPage } from './pages/PracticeSetupPage'
-import { PracticeUnavailablePage } from './pages/PracticeUnavailablePage'
+import { PracticePage } from './pages/PracticePage'
+import { SessionSummaryPage } from './pages/SessionSummaryPage'
 
 function App() {
   return (
@@ -13,7 +14,8 @@ function App() {
         <Route element={<AppLayout />}>
           <Route index element={<HomePage />} />
           <Route path="setup" element={<PracticeSetupPage />} />
-          <Route path="practice" element={<PracticeUnavailablePage />} />
+          <Route path="practice" element={<PracticePage />} />
+          <Route path="summary" element={<SessionSummaryPage />} />
           <Route
             path="statistics"
             element={
