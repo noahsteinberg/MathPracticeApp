@@ -184,8 +184,32 @@ Only checked items have been completed and verified.
 - [x] Generate inverse-operation fact-family questions for addition/subtraction and multiplication/division.
 - [x] Generate complete review questions with four answer choices and unit-test each strategy.
 
-- [ ] Phase 14 (tasks 58-62): review setup, priority, review sessions, success tracking, and mastery.
-- [ ] Phase 15 (tasks 63-65): advanced mistake statistics and details.
+## Phase 14 - Mistake Review Mode
+
+### 58. Review Setup
+
+- [x] Add regular-practice and mistake-review setup choices.
+- [x] Disable mistake review with an explanation when no active patterns exist, and show the active-pattern count.
+
+### 59. Review Priority
+
+- [x] Prioritize frequent, recent, and less-successfully reviewed mistakes, with randomized exact ties.
+
+### 60-62. Review Sessions, Success, and Mastery
+
+- [x] Build review sessions from eligible active patterns, avoid repeating a pattern when alternatives exist, and retain each question's source pattern ID.
+- [x] Record review outcomes against the original pattern and persist the result locally.
+- [x] Increment similar-question success, reset it after a review mistake, and mark patterns mastered at the configured threshold.
+- [x] Exclude mastered patterns from review while allowing a future regular-practice mistake to reactivate them.
+
+## Phase 15 - Advanced Mistake Statistics
+
+### 63-65. Insight Counts and Pattern Details
+
+- [x] Show active/mastered pattern counts plus review-question totals and correct outcomes.
+- [x] Identify tied most-missed operations and facts, sorted by incorrect count with an empty state.
+- [x] Show separate active and mastered pattern details with incorrect count, mastery progress, and most-recent incorrect date.
+
 - [ ] Phase 16 (tasks 66-69): keyboard, screen-reader, reduced-motion, and visual accessibility work.
 - [ ] Phase 17 (tasks 70-73): tablet/mobile/statistics responsive design and child-friendly feedback.
 - [ ] Phase 18 (tasks 74-75): active-session recovery and navigation safety.

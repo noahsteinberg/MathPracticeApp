@@ -6,6 +6,7 @@ import {
   loadAttempts,
   loadSettings,
   saveAttempt,
+  saveMistakePatterns,
   saveSession,
 } from '../services/storage'
 
@@ -80,5 +81,49 @@ describe('settings and statistics pages', () => {
     expect(loadAttempts()).toEqual([])
     expect(screen.getByText(/No questions yet/)).toBeInTheDocument()
     confirm.mockRestore()
+  })
+
+  it('shows active, mastered, and detailed mistake insights', () => {
+    saveMistakePatterns([
+      {
+        id: 'addition:2:3:difficulty-1',
+        operation: 'addition',
+        firstOperand: 2,
+        secondOperand: 3,
+        correctAnswer: 5,
+        difficulty: 1,
+        lastIncorrectAt: '2026-10-18T10:00:00.000Z',
+        incorrectCount: 2,
+        similarCorrectCount: 1,
+        isMastered: false,
+      },
+      {
+        id: 'division:12:3:difficulty-1',
+        operation: 'division',
+        firstOperand: 12,
+        secondOperand: 3,
+        correctAnswer: 4,
+        difficulty: 1,
+        lastIncorrectAt: '2026-10-17T10:00:00.000Z',
+        incorrectCount: 1,
+        similarCorrectCount: 3,
+        isMastered: true,
+      },
+    ])
+    window.history.pushState({}, '', '/statistics')
+    render(<App />)
+
+    expect(
+      screen.getByRole('heading', { name: 'Mistake review insights' }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Active mistakes').parentElement).toHaveTextContent(
+      '1 attempted',
+    )
+    expect(
+      screen.getAllByText('Mastered patterns')[0].parentElement,
+    ).toHaveTextContent('1 attempted')
+    expect(screen.getByText('Most missed facts')).toBeInTheDocument()
+    expect(screen.getAllByText('Mastered patterns')).toHaveLength(2)
+    expect(screen.getAllByText(/2 \+ 3/)).toHaveLength(2)
   })
 })

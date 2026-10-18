@@ -13,6 +13,7 @@ export interface PracticeSetupConfig {
   operations: MathOperation[]
   difficulty: DifficultyLevel
   sessionLength: SessionLength
+  reviewMode: ReviewMode
 }
 
 export interface Question {
@@ -104,6 +105,16 @@ export interface OperationStatistics {
 export interface AppStatistics extends OperationStatistics {
   byOperation: Record<MathOperation, OperationStatistics>
   byDifficulty: Record<DifficultyLevel, OperationStatistics>
+}
+
+export interface MistakeStatistics {
+  activeCount: number
+  masteredCount: number
+  reviewAttempted: number
+  reviewCorrect: number
+  mostMissedOperations: MathOperation[]
+  mostMissedPatterns: MistakePattern[]
+  sortedPatterns: MistakePattern[]
 }
 
 export function createEmptyOperationStatistics(): OperationStatistics {

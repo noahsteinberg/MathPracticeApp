@@ -1,9 +1,21 @@
 import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { QuestionCard } from '../components/practice/QuestionCard'
+import {
+  activeMistakePatterns,
+  selectReviewPattern,
+  updatePatternAfterReview,
+} from '../services/mistakeReview'
 import { createSessionQuestion } from '../services/questionGenerator'
 import { recordIncorrectQuestion } from '../services/mistakePatterns'
-import { loadSettings, saveAttempt, saveSession } from '../services/storage'
+import { generateSimilarQuestion } from '../services/similarQuestionGenerator'
+import {
+  loadMistakePatterns,
+  loadSettings,
+  saveAttempt,
+  saveMistakePatterns,
+  saveSession,
+} from '../services/storage'
 import type {
   PracticeSession,
   PracticeAttempt,
@@ -30,6 +42,18 @@ function createSession(setup: PracticeSetupConfig): PracticeSession {
   }
 }
 
+function createReviewQuestion(
+  setup: PracticeSetupConfig,
+  previousQuestion?: Question,
+): Question | null {
+  const pattern = selectReviewPattern(loadMistakePatterns(), loadSettings(), {
+    operations: setup.operations,
+    difficulty: setup.difficulty,
+    previousPatternId: previousQuestion?.mistakePatternId,
+  })
+  return pattern ? generateSimilarQuestion(pattern) : null
+}
+
 export function PracticePage() {
   const location = useLocation()
   const navigate = useNavigate()
@@ -39,6 +63,15 @@ export function PracticePage() {
   if (!setup || setup.operations.length === 0) {
     return <Navigate to="/setup" replace />
   }
+
+  const noReviewPatterns =
+    setup.reviewMode === 'mistake-review' &&
+    activeMistakePatterns(
+      loadMistakePatterns(),
+      setup.operations,
+      setup.difficulty,
+    ).length === 0
+  if (noReviewPatterns) return <Navigate to="/setup" replace />
 
   return (
     <ActivePracticeSession
@@ -60,7 +93,10 @@ function ActivePracticeSession({
 }: ActivePracticeSessionProps) {
   const [session, setSession] = useState(() => createSession(setup))
   const [question, setQuestion] = useState<Question>(() =>
-    createSessionQuestion(setup.operations, setup.difficulty),
+    setup.reviewMode === 'mistake-review'
+      ? (createReviewQuestion(setup) ??
+        createSessionQuestion(setup.operations, setup.difficulty))
+      : createSessionQuestion(setup.operations, setup.difficulty),
   )
   const [, setAttempts] = useState<PracticeAttempt[]>([])
 
@@ -89,6 +125,9 @@ function ActivePracticeSession({
       attemptedCount: session.attemptedCount + 1,
       correctCount: session.correctCount + Number(selfReportedCorrect),
       incorrectCount: session.incorrectCount + Number(!selfReportedCorrect),
+      mistakeReviewCount:
+        session.mistakeReviewCount +
+        Number(question.source === 'mistake-review'),
     }
 
     setSession(updatedSession)
@@ -112,12 +151,31 @@ function ActivePracticeSession({
     if (!selfReportedCorrect && question.source === 'regular') {
       recordIncorrectQuestion(question)
     }
+    if (question.source === 'mistake-review' && question.mistakePatternId) {
+      const updatedPatterns = updatePatternAfterReview(
+        loadMistakePatterns(),
+        question.mistakePatternId,
+        selfReportedCorrect,
+        loadSettings().masteryThreshold,
+      )
+      saveMistakePatterns(updatedPatterns)
+    }
     const isFixedSessionComplete =
       setup.sessionLength !== 'continuous' &&
       updatedSession.attemptedCount >= setup.sessionLength
 
     if (isFixedSessionComplete) {
       finishSession(updatedSession)
+      return
+    }
+
+    if (setup.reviewMode === 'mistake-review') {
+      const nextQuestion = createReviewQuestion(setup, question)
+      if (!nextQuestion) {
+        finishSession(updatedSession)
+        return
+      }
+      setQuestion(nextQuestion)
       return
     }
 

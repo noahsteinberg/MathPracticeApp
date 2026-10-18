@@ -71,14 +71,9 @@ export function SessionSummaryPage() {
         <Link className="button button--secondary" to="/">
           Return home
         </Link>
-        <button
-          className="button button--secondary"
-          type="button"
-          disabled
-          title="Mistake review begins in Phase 14"
-        >
-          Practice mistakes (coming soon)
-        </button>
+        <Link className="button button--secondary" to="/setup">
+          Practice mistakes
+        </Link>
       </div>
     </section>
   )

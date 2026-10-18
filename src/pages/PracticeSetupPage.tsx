@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { loadSettings } from '../services/storage'
+import { activeMistakePatterns } from '../services/mistakeReview'
+import { loadMistakePatterns, loadSettings } from '../services/storage'
 import type {
   DifficultyLevel,
   MathOperation,
   PracticeSetupConfig,
+  ReviewMode,
   SessionLength,
 } from '../types/math'
 
@@ -61,6 +63,14 @@ export function PracticeSetupPage() {
   const [sessionLength, setSessionLength] = useState<SessionLength | null>(
     defaults.defaultSessionLength,
   )
+  const [reviewMode, setReviewMode] = useState<ReviewMode>('regular')
+  const activePatterns = activeMistakePatterns(loadMistakePatterns())
+  const matchingReviewPatterns = activeMistakePatterns(
+    activePatterns,
+    selectedOperations,
+    difficulty ?? undefined,
+  )
+  const reviewAvailable = activePatterns.length > 0
 
   const toggleOperation = (operation: MathOperation) => {
     setSelectedOperations((current) =>
@@ -76,7 +86,8 @@ export function PracticeSetupPage() {
   const isValid =
     selectedOperations.length > 0 &&
     difficulty !== null &&
-    sessionLength !== null
+    sessionLength !== null &&
+    (reviewMode === 'regular' || matchingReviewPatterns.length > 0)
 
   const startPractice = () => {
     if (!isValid || difficulty === null || sessionLength === null) return
@@ -85,6 +96,7 @@ export function PracticeSetupPage() {
       operations: selectedOperations,
       difficulty,
       sessionLength,
+      reviewMode,
     }
 
     navigate('/practice', { state: { setup } })
@@ -190,6 +202,42 @@ export function PracticeSetupPage() {
               </label>
             ))}
           </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Which kind of practice?</legend>
+          <div className="choice-grid choice-grid--length">
+            <label className="choice-card">
+              <input
+                type="radio"
+                aria-label="Regular practice"
+                name="review-mode"
+                checked={reviewMode === 'regular'}
+                onChange={() => setReviewMode('regular')}
+              />
+              <span>Regular practice</span>
+            </label>
+            <label className="choice-card">
+              <input
+                type="radio"
+                aria-label="Practice mistakes"
+                name="review-mode"
+                checked={reviewMode === 'mistake-review'}
+                disabled={!reviewAvailable}
+                onChange={() => setReviewMode('mistake-review')}
+              />
+              <span>Practice mistakes</span>
+            </label>
+          </div>
+          <p className="field-help" aria-live="polite">
+            {reviewAvailable
+              ? `${activePatterns.length} active mistake ${activePatterns.length === 1 ? 'pattern is' : 'patterns are'} ready to review.`
+              : 'Practice mistakes is unavailable until you have an active mistake pattern.'}
+            {reviewMode === 'mistake-review' &&
+            matchingReviewPatterns.length === 0
+              ? ' Adjust your operations or difficulty to match an active mistake.'
+              : ''}
+          </p>
         </fieldset>
 
         <button

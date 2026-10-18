@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import App from '../App'
-import { loadMistakePatterns } from '../services/storage'
+import { loadMistakePatterns, saveMistakePatterns } from '../services/storage'
 
 async function startFixedSession(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('link', { name: 'Start practice' }))
@@ -101,6 +101,54 @@ describe('practice sessions', () => {
     expect(loadMistakePatterns()[0]).toMatchObject({
       incorrectCount: 1,
       isMastered: false,
+    })
+  })
+
+  it('disables mistake review until an active pattern exists', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByRole('link', { name: 'Start practice' }))
+
+    expect(screen.getByLabelText('Practice mistakes')).toBeDisabled()
+    expect(
+      screen.getByText(/unavailable until you have an active mistake/i),
+    ).toBeInTheDocument()
+  })
+
+  it('runs a review session and marks a pattern mastered at the configured threshold', async () => {
+    saveMistakePatterns([
+      {
+        id: 'addition:2:3:difficulty-2',
+        operation: 'addition',
+        firstOperand: 2,
+        secondOperand: 3,
+        correctAnswer: 5,
+        difficulty: 2,
+        lastIncorrectAt: '2026-10-18T10:00:00.000Z',
+        incorrectCount: 1,
+        similarCorrectCount: 0,
+        isMastered: false,
+      },
+    ])
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByRole('link', { name: 'Start practice' }))
+    await user.click(screen.getByLabelText('Practice mistakes'))
+    await user.click(screen.getByRole('button', { name: 'Start practice' }))
+
+    await reportCorrectAnswer(user)
+    await reportCorrectAnswer(user)
+    await reportCorrectAnswer(user)
+
+    expect(
+      screen.getByRole('heading', { name: 'Nice work!' }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText('Mistake-review questions:').parentElement,
+    ).toHaveTextContent('3')
+    expect(loadMistakePatterns()[0]).toMatchObject({
+      similarCorrectCount: 3,
+      isMastered: true,
     })
   })
 })

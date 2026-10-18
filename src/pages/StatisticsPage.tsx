@@ -2,12 +2,15 @@ import { useState } from 'react'
 import {
   clearPracticeHistory,
   loadAttempts,
+  loadMistakePatterns,
   loadSessions,
 } from '../services/storage'
+import { calculateMistakeStatistics } from '../services/mistakeStatistics'
 import { accuracy, calculateStatistics } from '../services/statistics'
 import type {
   DifficultyLevel,
   MathOperation,
+  MistakePattern,
   PracticeSession,
 } from '../types/math'
 
@@ -46,7 +49,12 @@ function StatCard({
 export function StatisticsPage() {
   const [attempts, setAttempts] = useState(loadAttempts)
   const [sessions, setSessions] = useState(loadSessions)
+  const [mistakePatterns] = useState(loadMistakePatterns)
   const statistics = calculateStatistics(attempts)
+  const mistakeStatistics = calculateMistakeStatistics(
+    mistakePatterns,
+    attempts,
+  )
   const recentSessions = [...sessions]
     .sort((left, right) =>
       (right.completedAt ?? right.startedAt).localeCompare(
@@ -109,6 +117,62 @@ export function StatisticsPage() {
           </div>
         </>
       )}
+      <section className="mistake-insights" aria-labelledby="mistake-title">
+        <h2 id="mistake-title">Mistake review insights</h2>
+        {mistakePatterns.length === 0 ? (
+          <p>No mistake patterns yet. Keep practicing and we will spot them.</p>
+        ) : (
+          <>
+            <div className="stat-grid">
+              <StatCard
+                label="Active mistakes"
+                attempted={mistakeStatistics.activeCount}
+                correct={0}
+                incorrect={0}
+              />
+              <StatCard
+                label="Mastered patterns"
+                attempted={mistakeStatistics.masteredCount}
+                correct={0}
+                incorrect={0}
+              />
+              <StatCard
+                label="Similar questions practiced"
+                attempted={mistakeStatistics.reviewAttempted}
+                correct={mistakeStatistics.reviewCorrect}
+                incorrect={
+                  mistakeStatistics.reviewAttempted -
+                  mistakeStatistics.reviewCorrect
+                }
+              />
+            </div>
+            <p>
+              <strong>Most missed operation:</strong>{' '}
+              {mistakeStatistics.mostMissedOperations
+                .map((operation) => operationLabels[operation])
+                .join(', ')}
+            </p>
+            <h3>Most missed facts</h3>
+            <MistakeList patterns={mistakeStatistics.mostMissedPatterns} />
+            <h3>Active mistake patterns</h3>
+            <MistakeList
+              patterns={mistakeStatistics.sortedPatterns.filter(
+                (pattern) => !pattern.isMastered,
+              )}
+            />
+            <h3>Mastered patterns</h3>
+            {mistakeStatistics.masteredCount === 0 ? (
+              <p>No patterns mastered yet.</p>
+            ) : (
+              <MistakeList
+                patterns={mistakeStatistics.sortedPatterns.filter(
+                  (pattern) => pattern.isMastered,
+                )}
+              />
+            )}
+          </>
+        )}
+      </section>
       <section
         className="recent-sessions"
         aria-labelledby="recent-sessions-title"
@@ -132,6 +196,33 @@ export function StatisticsPage() {
         Reset statistics
       </button>
     </section>
+  )
+}
+
+function MistakeList({ patterns }: { patterns: MistakePattern[] }) {
+  if (patterns.length === 0) return <p>None right now.</p>
+  return (
+    <ul className="mistake-list">
+      {patterns.map((pattern) => (
+        <li key={pattern.id}>
+          <strong>
+            {pattern.firstOperand}{' '}
+            {pattern.operation === 'addition'
+              ? '+'
+              : pattern.operation === 'subtraction'
+                ? '-'
+                : pattern.operation === 'multiplication'
+                  ? '×'
+                  : '÷'}{' '}
+            {pattern.secondOperand}
+          </strong>{' '}
+          — {pattern.incorrectCount} incorrect; {pattern.similarCorrectCount}{' '}
+          similar correct; last missed{' '}
+          {new Date(pattern.lastIncorrectAt).toLocaleDateString()};{' '}
+          {pattern.isMastered ? 'mastered' : 'active'}
+        </li>
+      ))}
+    </ul>
   )
 }
 

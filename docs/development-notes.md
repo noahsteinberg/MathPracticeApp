@@ -37,3 +37,11 @@
 - Decisions: addition and multiplication patterns use sorted operands as their identity, while subtraction and division retain operand order. A repeat incorrect result increases its count and resets related-answer progress and mastery. Similar questions retain the source pattern ID and use the existing four-choice answer generator.
 - Tests: pattern creation, commutative matching, repeat updates, persistence, nearby-number validity, reversal restrictions, all four inverse fact-family directions, complete review-card choices, and the Practice Page's incorrect-result integration path.
 - Fixes: none required after implementation; initial test run passed with 26 tests.
+
+## Phase 14-15 - Review sessions and mistake insights
+
+- Prompt focus: implement review setup, priority, session/mastery behavior, and detailed mistake statistics; stop before accessibility work.
+- Decisions: review eligibility is filtered by the selected operations and difficulty. Priority combines incorrect count, remaining successes to mastery, and recency; exact score ties are randomized. A review session ends early when all eligible patterns become mastered.
+- Tests: setup's disabled review state, review-session mastery flow, priority inputs and ties, mastery/reopen transitions, advanced review statistics/ties, and the statistics-page detail display.
+- Fixes: corrected two test selectors that initially targeted repeated labels rather than their containing summary/detail elements.
+- Verification: `npm test` (34 passing), `npm run lint`, `npm run format:check`, and `npm run build` all pass.

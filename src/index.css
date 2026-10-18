@@ -328,6 +328,16 @@ progress {
   border-radius: 1rem;
   padding: 1rem;
 }
+
+.mistake-insights {
+  margin-block: 2rem;
+}
+
+.mistake-list {
+  display: grid;
+  gap: 0.65rem;
+  padding-left: 1.25rem;
+}
 .stat-card h2,
 .recent-sessions h2,
 .settings-panel h2 {
