@@ -1,13 +1,19 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import type { PracticeAttempt, PracticeSession } from '../types/math'
+import type {
+  MistakePattern,
+  PracticeAttempt,
+  PracticeSession,
+} from '../types/math'
 import { DEFAULT_APP_SETTINGS } from '../types/math'
 import {
   clearAllApplicationData,
   clearPracticeHistory,
   loadAttempts,
+  loadMistakePatterns,
   loadSessions,
   loadSettings,
   saveAttempt,
+  saveMistakePatterns,
   saveSession,
   saveSettings,
   storageKeys,
@@ -39,6 +45,18 @@ const session: PracticeSession = {
   incorrectCount: 0,
   mistakeReviewCount: 0,
 }
+const mistakePattern: MistakePattern = {
+  id: 'addition:2:3:difficulty-1',
+  operation: 'addition',
+  firstOperand: 2,
+  secondOperand: 3,
+  correctAnswer: 5,
+  difficulty: 1,
+  lastIncorrectAt: '2026-01-01T00:00:00.000Z',
+  incorrectCount: 1,
+  similarCorrectCount: 0,
+  isMastered: false,
+}
 
 describe('storage service', () => {
   beforeEach(() => window.localStorage.clear())
@@ -50,7 +68,7 @@ describe('storage service', () => {
     expect(loadAttempts()).toEqual([])
   })
 
-  it('persists settings, attempts, and sessions', () => {
+  it('persists settings, attempts, sessions, and mistake patterns', () => {
     const settings = {
       ...DEFAULT_APP_SETTINGS,
       cardAnimationsEnabled: false,
@@ -59,20 +77,24 @@ describe('storage service', () => {
     expect(saveSettings(settings)).toBe(true)
     expect(saveAttempt(attempt)).toBe(true)
     expect(saveSession(session)).toBe(true)
+    expect(saveMistakePatterns([mistakePattern])).toBe(true)
     expect(loadSettings()).toEqual(settings)
     expect(loadAttempts()).toEqual([attempt])
     expect(loadSessions()).toEqual([session])
+    expect(loadMistakePatterns()).toEqual([mistakePattern])
   })
 
   it('clears history without clearing settings, then clears all data', () => {
     saveSettings({ ...DEFAULT_APP_SETTINGS, soundEffectsEnabled: false })
     saveAttempt(attempt)
     saveSession(session)
+    saveMistakePatterns([mistakePattern])
     expect(clearPracticeHistory()).toBe(true)
     expect(loadAttempts()).toEqual([])
     expect(loadSessions()).toEqual([])
     expect(loadSettings().soundEffectsEnabled).toBe(false)
     expect(clearAllApplicationData()).toBe(true)
     expect(loadSettings()).toEqual(DEFAULT_APP_SETTINGS)
+    expect(loadMistakePatterns()).toEqual([])
   })
 })

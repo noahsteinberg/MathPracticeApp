@@ -3,6 +3,7 @@ import {
   type AppSettings,
   type DifficultyLevel,
   type MathOperation,
+  type MistakePattern,
   type PracticeAttempt,
   type PracticeSession,
   type SessionLength,
@@ -15,6 +16,7 @@ const keys = {
   settings: `${PREFIX}:settings`,
   attempts: `${PREFIX}:attempts`,
   sessions: `${PREFIX}:sessions`,
+  mistakePatterns: `${PREFIX}:mistake-patterns`,
 } as const
 
 const operations: MathOperation[] = [
@@ -119,6 +121,22 @@ function isSession(value: unknown): value is PracticeSession {
   )
 }
 
+function isMistakePattern(value: unknown): value is MistakePattern {
+  if (!isObject(value)) return false
+  return (
+    typeof value.id === 'string' &&
+    isOperation(value.operation) &&
+    typeof value.firstOperand === 'number' &&
+    typeof value.secondOperand === 'number' &&
+    typeof value.correctAnswer === 'number' &&
+    isDifficulty(value.difficulty) &&
+    typeof value.lastIncorrectAt === 'string' &&
+    typeof value.incorrectCount === 'number' &&
+    typeof value.similarCorrectCount === 'number' &&
+    typeof value.isMastered === 'boolean'
+  )
+}
+
 export function initializeStorage(): void {
   const storedVersion = readJson<number>(keys.schemaVersion)
   if (storedVersion !== SCHEMA_VERSION) {
@@ -193,6 +211,17 @@ export function saveSession(session: PracticeSession): boolean {
   return writeJson(keys.sessions, sessions)
 }
 
+export function loadMistakePatterns(): MistakePattern[] {
+  initializeStorage()
+  const saved = readJson<unknown[]>(keys.mistakePatterns)
+  return Array.isArray(saved) ? saved.filter(isMistakePattern) : []
+}
+
+export function saveMistakePatterns(patterns: MistakePattern[]): boolean {
+  initializeStorage()
+  return writeJson(keys.mistakePatterns, patterns)
+}
+
 export function clearPracticeHistory(): boolean {
   return remove(keys.attempts) && remove(keys.sessions)
 }
@@ -203,6 +232,7 @@ export function clearAllApplicationData(): boolean {
     keys.settings,
     keys.attempts,
     keys.sessions,
+    keys.mistakePatterns,
   ].every(remove)
 }
 

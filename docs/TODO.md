@@ -167,8 +167,23 @@ Only checked items have been completed and verified.
 
 ## Remaining phases
 
-- [ ] Phase 12 (tasks 51-53): mistake-pattern creation, update, and persistence.
-- [ ] Phase 13 (tasks 54-57): nearby, reversed, and fact-family similar-question generation.
+## Phase 12 - Mistake Tracking
+
+### 51-53. Create, Update, and Persist Mistake Patterns
+
+- [x] Create a mistake pattern from every self-reported incorrect regular-practice question.
+- [x] Canonicalize addition and multiplication patterns while preserving subtraction/division operand order.
+- [x] Update existing patterns without duplication, reset their similar-answer progress, and persist validated patterns locally.
+
+## Phase 13 - Similar Question Generation
+
+### 54-57. Nearby, Reversed, and Fact-Family Questions
+
+- [x] Generate valid nearby-number questions tied to a mistake pattern.
+- [x] Generate reversed-operand questions only for addition and multiplication.
+- [x] Generate inverse-operation fact-family questions for addition/subtraction and multiplication/division.
+- [x] Generate complete review questions with four answer choices and unit-test each strategy.
+
 - [ ] Phase 14 (tasks 58-62): review setup, priority, review sessions, success tracking, and mastery.
 - [ ] Phase 15 (tasks 63-65): advanced mistake statistics and details.
 - [ ] Phase 16 (tasks 66-69): keyboard, screen-reader, reduced-motion, and visual accessibility work.

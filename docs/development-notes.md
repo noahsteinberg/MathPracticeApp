@@ -30,3 +30,10 @@
 - Tests: malformed-data recovery; settings/attempt/session persistence; history reset versus clear-all; aggregate statistics; settings changes; default application to setup; statistics display and reset.
 - Fixes: replaced Node 25's file-backed test `localStorage` with a deterministic in-memory test storage shim, and made a statistics assertion target its containing card because the value is intentionally split into semantic elements.
 - Verification: `npm test` (18 passing), `npm run lint`, `npm run format:check`, and `npm run build` all pass.
+
+## Phase 12-13 - Mistake tracking and similar questions
+
+- Prompt focus: record self-reported incorrect regular-practice results, persist mistake patterns, and create related questions; stop before review sessions and mastery tracking.
+- Decisions: addition and multiplication patterns use sorted operands as their identity, while subtraction and division retain operand order. A repeat incorrect result increases its count and resets related-answer progress and mastery. Similar questions retain the source pattern ID and use the existing four-choice answer generator.
+- Tests: pattern creation, commutative matching, repeat updates, persistence, nearby-number validity, reversal restrictions, all four inverse fact-family directions, complete review-card choices, and the Practice Page's incorrect-result integration path.
+- Fixes: none required after implementation; initial test run passed with 26 tests.

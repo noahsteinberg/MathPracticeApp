@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { QuestionCard } from '../components/practice/QuestionCard'
 import { createSessionQuestion } from '../services/questionGenerator'
+import { recordIncorrectQuestion } from '../services/mistakePatterns'
 import { loadSettings, saveAttempt, saveSession } from '../services/storage'
 import type {
   PracticeSession,
@@ -108,6 +109,9 @@ function ActivePracticeSession({
     }
     setAttempts((currentAttempts) => [...currentAttempts, attempt])
     saveAttempt(attempt)
+    if (!selfReportedCorrect && question.source === 'regular') {
+      recordIncorrectQuestion(question)
+    }
     const isFixedSessionComplete =
       setup.sessionLength !== 'continuous' &&
       updatedSession.attemptedCount >= setup.sessionLength

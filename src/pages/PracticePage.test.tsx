@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import App from '../App'
+import { loadMistakePatterns } from '../services/storage'
 
 async function startFixedSession(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('link', { name: 'Start practice' }))
@@ -86,5 +87,20 @@ describe('practice sessions', () => {
       screen.getByRole('heading', { name: 'Questions completed: 1' }),
     ).toBeInTheDocument()
     confirm.mockRestore()
+  })
+
+  it('records an incorrect regular-practice question as a mistake pattern', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await startFixedSession(user)
+    await user.click(screen.getAllByRole('radio')[0])
+    await user.click(screen.getByRole('button', { name: 'Flip card' }))
+    await user.click(screen.getByRole('button', { name: 'I got it wrong' }))
+
+    expect(loadMistakePatterns()).toHaveLength(1)
+    expect(loadMistakePatterns()[0]).toMatchObject({
+      incorrectCount: 1,
+      isMastered: false,
+    })
   })
 })
