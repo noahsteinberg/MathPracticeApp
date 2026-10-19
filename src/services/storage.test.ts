@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import type {
+  ActivePracticeSession,
   MistakePattern,
   PracticeAttempt,
   PracticeSession,
@@ -7,12 +8,15 @@ import type {
 import { DEFAULT_APP_SETTINGS } from '../types/math'
 import {
   clearAllApplicationData,
+  clearActiveSession,
   clearPracticeHistory,
+  loadActiveSession,
   loadAttempts,
   loadMistakePatterns,
   loadSessions,
   loadSettings,
   saveAttempt,
+  saveActiveSession,
   saveMistakePatterns,
   saveSession,
   saveSettings,
@@ -58,6 +62,28 @@ const mistakePattern: MistakePattern = {
   isMastered: false,
 }
 
+const activeSession: ActivePracticeSession = {
+  setup: {
+    operations: ['addition'],
+    difficulty: 1,
+    sessionLength: 5,
+    reviewMode: 'regular',
+  },
+  session: { ...session, completedAt: undefined },
+  question: {
+    id: 'active-question',
+    operation: 'addition',
+    firstOperand: 2,
+    secondOperand: 3,
+    displayText: '2 + 3 = ?',
+    correctAnswer: 5,
+    choices: [3, 4, 5, 6],
+    difficulty: 1,
+    source: 'regular',
+  },
+  selectedAnswer: 5,
+}
+
 describe('storage service', () => {
   beforeEach(() => window.localStorage.clear())
 
@@ -82,6 +108,19 @@ describe('storage service', () => {
     expect(loadAttempts()).toEqual([attempt])
     expect(loadSessions()).toEqual([session])
     expect(loadMistakePatterns()).toEqual([mistakePattern])
+  })
+
+  it('persists and clears a validated unfinished session', () => {
+    expect(saveActiveSession(activeSession)).toBe(true)
+    expect(loadActiveSession()).toEqual(activeSession)
+    expect(clearActiveSession()).toBe(true)
+    expect(loadActiveSession()).toBeNull()
+
+    window.localStorage.setItem(
+      storageKeys.activeSession,
+      JSON.stringify({ ...activeSession, selectedAnswer: 'not a number' }),
+    )
+    expect(loadActiveSession()).toBeNull()
   })
 
   it('clears history without clearing settings, then clears all data', () => {

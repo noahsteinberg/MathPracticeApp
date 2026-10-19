@@ -1,5 +1,6 @@
 import {
   DEFAULT_APP_SETTINGS,
+  type ActivePracticeSession,
   type AppSettings,
   type DifficultyLevel,
   type MathOperation,
@@ -17,6 +18,7 @@ const keys = {
   attempts: `${PREFIX}:attempts`,
   sessions: `${PREFIX}:sessions`,
   mistakePatterns: `${PREFIX}:mistake-patterns`,
+  activeSession: `${PREFIX}:active-session`,
 } as const
 
 const operations: MathOperation[] = [
@@ -121,6 +123,56 @@ function isSession(value: unknown): value is PracticeSession {
   )
 }
 
+function isQuestion(
+  value: unknown,
+): value is ActivePracticeSession['question'] {
+  if (!isObject(value) || !Array.isArray(value.choices)) return false
+  return (
+    typeof value.id === 'string' &&
+    isOperation(value.operation) &&
+    typeof value.firstOperand === 'number' &&
+    typeof value.secondOperand === 'number' &&
+    typeof value.displayText === 'string' &&
+    typeof value.correctAnswer === 'number' &&
+    value.choices.length === 4 &&
+    value.choices.every((choice) => typeof choice === 'number') &&
+    isDifficulty(value.difficulty) &&
+    (value.source === 'regular' || value.source === 'mistake-review') &&
+    (value.mistakePatternId === undefined ||
+      typeof value.mistakePatternId === 'string')
+  )
+}
+
+function isPracticeSetup(
+  value: unknown,
+): value is ActivePracticeSession['setup'] {
+  if (!isObject(value) || !Array.isArray(value.operations)) return false
+  return (
+    value.operations.length > 0 &&
+    value.operations.every(isOperation) &&
+    isDifficulty(value.difficulty) &&
+    isSessionLength(value.sessionLength) &&
+    (value.reviewMode === 'regular' || value.reviewMode === 'mistake-review')
+  )
+}
+
+function isActivePracticeSession(
+  value: unknown,
+): value is ActivePracticeSession {
+  if (!isObject(value)) return false
+  return (
+    isPracticeSetup(value.setup) &&
+    isSession(value.session) &&
+    value.session.completedAt === undefined &&
+    isQuestion(value.question) &&
+    (value.selectedAnswer === null ||
+      typeof value.selectedAnswer === 'number') &&
+    value.session.operations.join() === value.setup.operations.join() &&
+    value.session.difficulty === value.setup.difficulty &&
+    value.session.sessionLength === value.setup.sessionLength
+  )
+}
+
 function isMistakePattern(value: unknown): value is MistakePattern {
   if (!isObject(value)) return false
   return (
@@ -215,6 +267,23 @@ export function saveSession(session: PracticeSession): boolean {
   return writeJson(keys.sessions, sessions)
 }
 
+export function loadActiveSession(): ActivePracticeSession | null {
+  initializeStorage()
+  const saved = readJson<unknown>(keys.activeSession)
+  return isActivePracticeSession(saved) ? saved : null
+}
+
+export function saveActiveSession(
+  activeSession: ActivePracticeSession,
+): boolean {
+  initializeStorage()
+  return writeJson(keys.activeSession, activeSession)
+}
+
+export function clearActiveSession(): boolean {
+  return remove(keys.activeSession)
+}
+
 export function loadMistakePatterns(): MistakePattern[] {
   initializeStorage()
   const saved = readJson<unknown[]>(keys.mistakePatterns)
@@ -227,7 +296,9 @@ export function saveMistakePatterns(patterns: MistakePattern[]): boolean {
 }
 
 export function clearPracticeHistory(): boolean {
-  return remove(keys.attempts) && remove(keys.sessions)
+  return (
+    remove(keys.attempts) && remove(keys.sessions) && remove(keys.activeSession)
+  )
 }
 
 export function clearAllApplicationData(): boolean {
@@ -237,6 +308,7 @@ export function clearAllApplicationData(): boolean {
     keys.attempts,
     keys.sessions,
     keys.mistakePatterns,
+    keys.activeSession,
   ].every(remove)
 }
 

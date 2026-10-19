@@ -61,3 +61,11 @@
 - Tests: deterministic positive/supportive feedback-message selection; correct and incorrect practice-result feedback; feedback-setting persistence and disabled-message behavior; existing session, statistics, and settings coverage remains in the suite.
 - Fixes: added overflow-safe wrapping for long history/detail text and full-width narrow-screen controls to prevent layout spillover.
 - Verification: `node .\\node_modules\\vitest\\vitest.mjs run --pool=forks --maxWorkers=1 --no-file-parallelism` (40 passing), `npm run lint`, `npm run format:check`, and `npm run build` pass. The serialized Vitest invocation avoids an intermittent local worker-startup timeout from the npm wrapper.
+
+## Phase 18 - Session Recovery and Navigation Safety
+
+- Prompt focus: persist and restore unfinished sessions, protect against accidental navigation, and stop before error-handling work.
+- Decisions: the active-session record stores the setup, unfinished session counters, current question, and selected answer only; it is independently validated and never treated as a completed session. Choosing to leave via in-app navigation discards that recoverable state, while refresh/close uses the browser's native warning and retains it for restoration.
+- Tests: storage validation/persistence/clear behavior; refresh restoration including the selected answer; saved-state clearing on completed session; and cancel/confirm behavior for navigation away from active practice.
+- Fixes: prevented the persistence effect from recreating the active record during the final completion render.
+- Verification: `node .\\node_modules\\vitest\\vitest.mjs run --pool=forks --maxWorkers=1 --no-file-parallelism` (43 passing), `npm run lint`, `npm run format:check`, and `npm run build` pass.

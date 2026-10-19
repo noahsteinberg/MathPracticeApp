@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { QuestionCard } from '../components/practice/QuestionCard'
+import { ActiveSessionContext } from '../contexts/activeSessionState'
 import { feedbackMessage } from '../services/feedback'
 import {
   activeMistakePatterns,
@@ -12,7 +13,10 @@ import { recordIncorrectQuestion } from '../services/mistakePatterns'
 import { generateSimilarQuestion } from '../services/similarQuestionGenerator'
 import {
   loadMistakePatterns,
+  loadActiveSession,
   loadSettings,
+  clearActiveSession,
+  saveActiveSession,
   saveAttempt,
   saveMistakePatterns,
   saveSession,
@@ -20,6 +24,7 @@ import {
 import type {
   PracticeSession,
   PracticeAttempt,
+  ActivePracticeSession,
   PracticeSetupConfig,
   Question,
   SessionSummaryData,
@@ -59,7 +64,8 @@ export function PracticePage() {
   const location = useLocation()
   const navigate = useNavigate()
   const state = location.state as PracticeLocationState | null
-  const setup = state?.setup
+  const recoveredSession = state?.setup ? null : loadActiveSession()
+  const setup = state?.setup ?? recoveredSession?.setup
 
   if (!setup || setup.operations.length === 0) {
     return <Navigate to="/setup" replace />
@@ -78,6 +84,7 @@ export function PracticePage() {
     <ActivePracticeSession
       key={location.key}
       setup={setup}
+      recoveredSession={recoveredSession}
       onComplete={navigate}
     />
   )
@@ -85,29 +92,61 @@ export function PracticePage() {
 
 interface ActivePracticeSessionProps {
   setup: PracticeSetupConfig
+  recoveredSession: ActivePracticeSession | null
   onComplete: ReturnType<typeof useNavigate>
 }
 
 function ActivePracticeSession({
   setup,
+  recoveredSession,
   onComplete,
 }: ActivePracticeSessionProps) {
-  const [session, setSession] = useState(() => createSession(setup))
+  const activeSession = useContext(ActiveSessionContext)
+  if (!activeSession)
+    throw new Error('Practice requires active-session navigation.')
+  const { setHasActiveSession } = activeSession
+  const [session, setSession] = useState(
+    () => recoveredSession?.session ?? createSession(setup),
+  )
   const [feedback, setFeedback] = useState<string | null>(null)
-  const [question, setQuestion] = useState<Question>(() =>
-    setup.reviewMode === 'mistake-review'
-      ? (createReviewQuestion(setup) ??
-        createSessionQuestion(setup.operations, setup.difficulty))
-      : createSessionQuestion(setup.operations, setup.difficulty),
+  const [question, setQuestion] = useState<Question>(
+    () =>
+      recoveredSession?.question ??
+      (setup.reviewMode === 'mistake-review'
+        ? (createReviewQuestion(setup) ??
+          createSessionQuestion(setup.operations, setup.difficulty))
+        : createSessionQuestion(setup.operations, setup.difficulty)),
+  )
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(
+    recoveredSession?.selectedAnswer ?? null,
   )
   const [, setAttempts] = useState<PracticeAttempt[]>([])
+  const sessionFinished = useRef(false)
+
+  useEffect(() => {
+    if (sessionFinished.current) return
+    saveActiveSession({ setup, session, question, selectedAnswer })
+    setHasActiveSession(true)
+  }, [question, selectedAnswer, session, setHasActiveSession, setup])
+
+  useEffect(() => {
+    const warnBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault()
+      event.returnValue = ''
+    }
+    window.addEventListener('beforeunload', warnBeforeUnload)
+    return () => window.removeEventListener('beforeunload', warnBeforeUnload)
+  }, [])
 
   const finishSession = (completedSession: PracticeSession) => {
+    sessionFinished.current = true
     const finishedSession = {
       ...completedSession,
       completedAt: new Date().toISOString(),
     }
     saveSession(finishedSession)
+    clearActiveSession()
+    setHasActiveSession(false)
     const summary: SessionSummaryData = {
       setup,
       session: finishedSession,
@@ -184,6 +223,7 @@ function ActivePracticeSession({
         return
       }
       setQuestion(nextQuestion)
+      setSelectedAnswer(null)
       return
     }
 
@@ -194,6 +234,7 @@ function ActivePracticeSession({
         currentQuestion,
       ),
     )
+    setSelectedAnswer(null)
   }
 
   const endContinuousSession = () => {
@@ -249,6 +290,8 @@ function ActivePracticeSession({
       <QuestionCard
         question={question}
         animationsEnabled={loadSettings().cardAnimationsEnabled}
+        initialSelectedAnswer={selectedAnswer}
+        onSelectedAnswerChange={setSelectedAnswer}
         onResult={handleResult}
       />
     </section>

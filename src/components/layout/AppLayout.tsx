@@ -1,4 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom'
+import { useContext, type MouseEvent } from 'react'
+import { ActiveSessionContext } from '../../contexts/activeSessionState'
 
 const navigationItems = [
   { to: '/', label: 'Home', end: true },
@@ -8,10 +10,18 @@ const navigationItems = [
 ]
 
 export function AppLayout() {
+  const activeSession = useContext(ActiveSessionContext)
+  if (!activeSession)
+    throw new Error('App layout requires active-session navigation.')
+  const { confirmLeaveActiveSession } = activeSession
+  const confirmNavigation = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!confirmLeaveActiveSession()) event.preventDefault()
+  }
+
   return (
     <div className="app-shell">
       <header className="site-header">
-        <NavLink className="brand" to="/" end>
+        <NavLink className="brand" to="/" end onClick={confirmNavigation}>
           Math Sprouts
         </NavLink>
         <nav aria-label="Main navigation">
@@ -24,6 +34,7 @@ export function AppLayout() {
                   }
                   to={to}
                   end={end}
+                  onClick={confirmNavigation}
                 >
                   {label}
                 </NavLink>

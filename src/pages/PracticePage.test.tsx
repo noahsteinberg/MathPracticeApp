@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import App from '../App'
 import { feedbackMessages } from '../services/feedback'
 import {
+  loadActiveSession,
   loadMistakePatterns,
   saveMistakePatterns,
   saveSettings,
@@ -66,6 +67,7 @@ describe('practice sessions', () => {
     expect(screen.getByText('Attempted').nextSibling).toHaveTextContent('5')
     expect(screen.getByText('Correct').nextSibling).toHaveTextContent('5')
     expect(screen.getByText('Accuracy').nextSibling).toHaveTextContent('100%')
+    expect(loadActiveSession()).toBeNull()
 
     await user.click(screen.getByRole('button', { name: 'Practice again' }))
     expect(
@@ -161,6 +163,49 @@ describe('practice sessions', () => {
             ),
         ),
     ).toBe(true)
+  })
+
+  it('restores an unfinished session and its selected answer after a refresh', async () => {
+    const user = userEvent.setup()
+    const { unmount } = render(<App />)
+    await startFixedSession(user)
+    await user.click(screen.getAllByRole('radio')[0])
+    const selectedAnswer = screen.getAllByRole('radio')[0].getAttribute('value')
+
+    expect(loadActiveSession()).toMatchObject({
+      session: { attemptedCount: 0 },
+      selectedAnswer: Number(selectedAnswer),
+    })
+    unmount()
+    window.history.pushState({}, '', '/practice')
+    render(<App />)
+
+    expect(
+      screen.getByRole('heading', { name: 'Question 1 of 5' }),
+    ).toBeInTheDocument()
+    expect(screen.getAllByRole('radio')[0]).toBeChecked()
+  })
+
+  it('keeps or clears an active session based on the navigation confirmation', async () => {
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false)
+    const user = userEvent.setup()
+    render(<App />)
+    await startFixedSession(user)
+
+    await user.click(screen.getByRole('link', { name: 'Statistics' }))
+    expect(confirm).toHaveBeenCalledOnce()
+    expect(
+      screen.getByRole('heading', { name: 'Question 1 of 5' }),
+    ).toBeInTheDocument()
+    expect(loadActiveSession()).not.toBeNull()
+
+    confirm.mockReturnValue(true)
+    await user.click(screen.getByRole('link', { name: 'Home' }))
+    expect(
+      screen.getByRole('heading', { name: 'Ready to grow your math skills?' }),
+    ).toBeInTheDocument()
+    expect(loadActiveSession()).toBeNull()
+    confirm.mockRestore()
   })
 
   it('disables mistake review until an active pattern exists', async () => {

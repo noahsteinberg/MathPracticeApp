@@ -58,6 +58,14 @@ export interface PracticeSession {
   mistakeReviewCount: number
 }
 
+/** Enough state to safely resume an unfinished practice session after a refresh. */
+export interface ActivePracticeSession {
+  setup: PracticeSetupConfig
+  session: PracticeSession
+  question: Question
+  selectedAnswer: number | null
+}
+
 export interface SessionSummaryData {
   session: PracticeSession
   setup: PracticeSetupConfig

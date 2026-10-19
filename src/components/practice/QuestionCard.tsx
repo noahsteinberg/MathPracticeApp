@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 import type { Question } from '../../types/math'
 import { AnswerChoice } from './AnswerChoice'
@@ -6,6 +6,8 @@ import { AnswerChoice } from './AnswerChoice'
 interface QuestionCardProps {
   question: Question
   animationsEnabled?: boolean
+  initialSelectedAnswer?: number | null
+  onSelectedAnswerChange?: (selectedAnswer: number | null) => void
   onResult: (result: {
     selectedAnswer: number
     selfReportedCorrect: boolean
@@ -15,6 +17,8 @@ interface QuestionCardProps {
 export function QuestionCard({
   question,
   animationsEnabled,
+  initialSelectedAnswer,
+  onSelectedAnswerChange,
   onResult,
 }: QuestionCardProps) {
   return (
@@ -22,6 +26,8 @@ export function QuestionCard({
       key={question.id}
       question={question}
       animationsEnabled={animationsEnabled}
+      initialSelectedAnswer={initialSelectedAnswer}
+      onSelectedAnswerChange={onSelectedAnswerChange}
       onResult={onResult}
     />
   )
@@ -30,13 +36,24 @@ export function QuestionCard({
 function QuestionCardContent({
   question,
   animationsEnabled = true,
+  initialSelectedAnswer = null,
+  onSelectedAnswerChange,
   onResult,
 }: QuestionCardProps) {
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(
+    initialSelectedAnswer,
+  )
   const [isFlipped, setIsFlipped] = useState(false)
   const [resultRecorded, setResultRecorded] = useState(false)
   const prefersReducedMotion = usePrefersReducedMotion()
   const shouldAnimate = animationsEnabled && !prefersReducedMotion
+  const selectAnswer = useCallback(
+    (answer: number) => {
+      setSelectedAnswer(answer)
+      onSelectedAnswerChange?.(answer)
+    },
+    [onSelectedAnswerChange],
+  )
 
   useEffect(() => {
     const selectNumberedAnswer = (event: KeyboardEvent) => {
@@ -54,12 +71,12 @@ function QuestionCardContent({
       const choiceNumber = Number(event.key)
       if (choiceNumber < 1 || choiceNumber > question.choices.length) return
       event.preventDefault()
-      setSelectedAnswer(question.choices[choiceNumber - 1])
+      selectAnswer(question.choices[choiceNumber - 1])
     }
 
     window.addEventListener('keydown', selectNumberedAnswer)
     return () => window.removeEventListener('keydown', selectNumberedAnswer)
-  }, [isFlipped, question.choices, resultRecorded])
+  }, [isFlipped, question.choices, resultRecorded, selectAnswer])
 
   const recordResult = (selfReportedCorrect: boolean) => {
     if (selectedAnswer === null || resultRecorded) return
@@ -96,7 +113,7 @@ function QuestionCardContent({
                 choiceNumber={index + 1}
                 checked={selectedAnswer === answer}
                 disabled={false}
-                onSelect={setSelectedAnswer}
+                onSelect={selectAnswer}
               />
             ))}
           </div>

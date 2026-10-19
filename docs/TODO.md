@@ -254,7 +254,18 @@ Only checked items have been completed and verified.
 
 - [x] Show varied, positive feedback after a self-reported correct answer and supportive, non-shaming feedback after a mistake.
 - [x] Persist a setting that lets learners turn feedback messages off.
-- [ ] Phase 18 (tasks 74-75): active-session recovery and navigation safety.
+
+## Phase 18 - Session Recovery and Navigation Safety
+
+### 74. Persist an Active Session
+
+- [x] Persist the unfinished setup, session progress, current question, and selected answer in validated app storage.
+- [x] Restore an unfinished session after a refresh and clear its saved state when the session ends.
+
+### 75. Protect Against Accidental Navigation
+
+- [x] Warn before leaving an active session through app navigation or browser refresh/close.
+- [x] Let the learner cancel and continue, or confirm leaving to clear the recoverable session; do not warn after completion.
 - [ ] Phase 19 (tasks 76-78): invalid-data, generation-failure, and user-facing error handling.
 - [ ] Phase 20 (tasks 79-82): unit, component, integration, and accessibility testing.
 - [ ] Phase 21 (tasks 83-85): rendering, history-size, and loading performance work.
