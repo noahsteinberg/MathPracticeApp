@@ -1,5 +1,6 @@
 interface AnswerChoiceProps {
   answer: number
+  choiceNumber: number
   checked: boolean
   disabled: boolean
   onSelect: (answer: number) => void
@@ -7,6 +8,7 @@ interface AnswerChoiceProps {
 
 export function AnswerChoice({
   answer,
+  choiceNumber,
   checked,
   disabled,
   onSelect,
@@ -22,11 +24,15 @@ export function AnswerChoice({
         aria-label={`Answer ${answer}`}
         name="answer-choice"
         value={answer}
+        data-choice-number={choiceNumber}
         checked={checked}
         disabled={disabled}
         onChange={() => onSelect(answer)}
       />
       <span>{answer}</span>
+      {checked && (
+        <span className="answer-choice__selected-label">Selected</span>
+      )}
     </label>
   )
 }

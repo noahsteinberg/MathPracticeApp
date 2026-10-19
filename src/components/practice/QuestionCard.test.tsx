@@ -55,4 +55,66 @@ describe('QuestionCard', () => {
     )
     expect(screen.getByRole('button', { name: 'Flip card' })).toBeDisabled()
   })
+
+  it('supports number keys for answers without overriding an active form input', async () => {
+    const user = userEvent.setup()
+    render(<QuestionCard question={question} onResult={vi.fn()} />)
+
+    await user.keyboard('2')
+    expect(screen.getByRole('radio', { name: 'Answer 54' })).toBeChecked()
+    expect(screen.getByText('Selected')).toBeInTheDocument()
+
+    const { unmount } = render(
+      <>
+        <input aria-label="Notes" />
+        <QuestionCard question={question} onResult={vi.fn()} />
+      </>,
+    )
+    await user.click(screen.getByLabelText('Notes'))
+    await user.keyboard('2')
+    expect(
+      screen.getAllByRole('button', { name: 'Flip card' })[1],
+    ).toBeDisabled()
+    unmount()
+  })
+
+  it('announces new questions and revealed answers for screen readers', async () => {
+    const user = userEvent.setup()
+    render(<QuestionCard question={question} onResult={vi.fn()} />)
+
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'New question: 7 x 8 = ?',
+    )
+    await user.click(screen.getByRole('radio', { name: 'Answer 56' }))
+    await user.click(screen.getByRole('button', { name: 'Flip card' }))
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'The correct answer is 56.',
+    )
+  })
+
+  it('disables card animation when reduced motion is preferred', () => {
+    const addEventListener = vi.fn()
+    const removeEventListener = vi.fn()
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn().mockReturnValue({
+        matches: true,
+        addEventListener,
+        removeEventListener,
+      }),
+    )
+    const { unmount } = render(
+      <QuestionCard question={question} animationsEnabled onResult={vi.fn()} />,
+    )
+
+    expect(screen.getByRole('status').parentElement).toHaveClass(
+      'question-card--no-animation',
+    )
+    unmount()
+    expect(removeEventListener).toHaveBeenCalledWith(
+      'change',
+      expect.any(Function),
+    )
+    vi.unstubAllGlobals()
+  })
 })

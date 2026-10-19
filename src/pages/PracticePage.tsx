@@ -203,6 +203,11 @@ function ActivePracticeSession({
 
   return (
     <section className="practice-page" aria-labelledby="practice-heading">
+      <p className="sr-only" role="status" aria-atomic="true">
+        {isContinuous
+          ? `Session progress: ${session.attemptedCount} questions completed.`
+          : `Session progress: Question ${questionNumber} of ${setup.sessionLength}.`}
+      </p>
       <div className="practice-status">
         <div>
           <p className="eyebrow">Practice time</p>

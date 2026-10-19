@@ -45,3 +45,11 @@
 - Tests: setup's disabled review state, review-session mastery flow, priority inputs and ties, mastery/reopen transitions, advanced review statistics/ties, and the statistics-page detail display.
 - Fixes: corrected two test selectors that initially targeted repeated labels rather than their containing summary/detail elements.
 - Verification: `npm test` (34 passing), `npm run lint`, `npm run format:check`, and `npm run build` all pass.
+
+## Phase 16 - Accessibility
+
+- Prompt focus: improve keyboard access, screen-reader feedback, reduced-motion behavior, and visual accessibility; stop before responsive-design work.
+- Decisions: number-key shortcuts are active only outside editable form controls, while semantic buttons retain native Enter/Space behavior. There are no icon-only buttons in the current interface. The card animation is disabled when either the saved setting is off or the operating-system motion preference requests reduction.
+- Tests: number-key selection, editable-input shortcut protection, selected-state text, screen-reader question/reveal announcements, reduced-motion class behavior, and session-progress announcement coverage.
+- Fixes: restored a click in one existing card test after jsdom did not emulate native focused-button Enter activation; browser-native button semantics remain unchanged.
+- Verification: `npm test` (37 passing), `npm run lint`, `npm run format:check`, and `npm run build` all pass.

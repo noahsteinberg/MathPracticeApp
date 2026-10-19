@@ -30,6 +30,13 @@ describe('practice sessions', () => {
     expect(
       screen.getByRole('heading', { name: 'Question 1 of 5' }),
     ).toBeInTheDocument()
+    expect(
+      screen
+        .getAllByRole('status')
+        .some((status) =>
+          status.textContent?.includes('Session progress: Question 1 of 5.'),
+        ),
+    ).toBe(true)
 
     await reportCorrectAnswer(user)
     expect(

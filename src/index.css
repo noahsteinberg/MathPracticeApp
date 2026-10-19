@@ -430,6 +430,15 @@ progress {
   min-height: 4.5rem;
   padding: 0.75rem;
 }
+.answer-choice__selected-label {
+  background: #403281;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  padding: 0.25rem 0.45rem;
+  text-transform: uppercase;
+}
 .answer-choice:has(input:checked),
 .answer-choice--selected {
   background: #f0edff;
@@ -452,6 +461,22 @@ progress {
   gap: 0.75rem;
   justify-content: center;
   margin-top: 1.5rem;
+}
+.question-card__shortcut {
+  color: #44526d;
+  font-size: 0.9rem;
+  margin: 1rem 0 0;
+}
+
+.sr-only {
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
 }
 
 @keyframes card-enter {
@@ -478,6 +503,17 @@ progress {
 :focus-visible {
   outline: 3px solid #ffac4b;
   outline-offset: 3px;
+}
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 3px solid Highlight;
+  }
+
+  .answer-choice--selected,
+  .choice-card:has(input:checked) {
+    border: 3px solid Highlight;
+  }
 }
 
 @media (max-width: 600px) {

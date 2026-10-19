@@ -210,7 +210,30 @@ Only checked items have been completed and verified.
 - [x] Identify tied most-missed operations and facts, sorted by incorrect count with an empty state.
 - [x] Show separate active and mastered pattern details with incorrect count, mastery progress, and most-recent incorrect date.
 
-- [ ] Phase 16 (tasks 66-69): keyboard, screen-reader, reduced-motion, and visual accessibility work.
+## Phase 16 - Accessibility
+
+### 66. Keyboard Navigation
+
+- [x] Preserve semantic, tabbable native controls with visible focus indicators and native Enter/Space button behavior.
+- [x] Add 1–4 answer-choice shortcuts without intercepting keyboard input in form controls.
+
+### 67. Screen-Reader Support
+
+- [x] Retain semantic headings, forms, navigation, and named answer controls.
+- [x] Add polite, atomic announcements for new questions, revealed answers, and session progress.
+- [x] Confirm no icon-only buttons currently require a separate accessible name.
+
+### 68. Reduced Motion
+
+- [x] Detect `prefers-reduced-motion` and disable card animation while preserving the card content transition.
+- [x] Respect both the system preference and the saved card-animation setting.
+
+### 69. Visual Accessibility
+
+- [x] Keep high-contrast visible focus treatment and add forced-colors support.
+- [x] Add a text selected-state indicator so selection is not communicated by color alone.
+- [x] Keep text in scalable `rem`/`clamp` units and layouts fluid for 200% zoom and larger system font sizes.
+
 - [ ] Phase 17 (tasks 70-73): tablet/mobile/statistics responsive design and child-friendly feedback.
 - [ ] Phase 18 (tasks 74-75): active-session recovery and navigation safety.
 - [ ] Phase 19 (tasks 76-78): invalid-data, generation-failure, and user-facing error handling.

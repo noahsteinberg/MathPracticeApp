@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 import type { Question } from '../../types/math'
 import { AnswerChoice } from './AnswerChoice'
 
@@ -34,6 +35,31 @@ function QuestionCardContent({
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
   const [isFlipped, setIsFlipped] = useState(false)
   const [resultRecorded, setResultRecorded] = useState(false)
+  const prefersReducedMotion = usePrefersReducedMotion()
+  const shouldAnimate = animationsEnabled && !prefersReducedMotion
+
+  useEffect(() => {
+    const selectNumberedAnswer = (event: KeyboardEvent) => {
+      const target = event.target
+      if (
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target instanceof HTMLSelectElement ||
+        (target instanceof HTMLElement && target.isContentEditable) ||
+        isFlipped ||
+        resultRecorded
+      ) {
+        return
+      }
+      const choiceNumber = Number(event.key)
+      if (choiceNumber < 1 || choiceNumber > question.choices.length) return
+      event.preventDefault()
+      setSelectedAnswer(question.choices[choiceNumber - 1])
+    }
+
+    window.addEventListener('keydown', selectNumberedAnswer)
+    return () => window.removeEventListener('keydown', selectNumberedAnswer)
+  }, [isFlipped, question.choices, resultRecorded])
 
   const recordResult = (selfReportedCorrect: boolean) => {
     if (selectedAnswer === null || resultRecorded) return
@@ -46,10 +72,14 @@ function QuestionCardContent({
       className={[
         'question-card',
         isFlipped ? 'question-card--flipped' : '',
-        animationsEnabled ? '' : 'question-card--no-animation',
+        shouldAnimate ? '' : 'question-card--no-animation',
       ].join(' ')}
-      aria-live="polite"
     >
+      <p className="sr-only" role="status" aria-atomic="true">
+        {isFlipped
+          ? `Answer revealed. Your answer is ${selectedAnswer}. The correct answer is ${question.correctAnswer}.`
+          : `New question: ${question.displayText} Choose one of four answers.`}
+      </p>
       {!isFlipped ? (
         <div className="question-card__face">
           <p className="eyebrow">Choose your answer</p>
@@ -59,10 +89,11 @@ function QuestionCardContent({
             role="radiogroup"
             aria-label="Answer choices"
           >
-            {question.choices.map((answer) => (
+            {question.choices.map((answer, index) => (
               <AnswerChoice
                 key={answer}
                 answer={answer}
+                choiceNumber={index + 1}
                 checked={selectedAnswer === answer}
                 disabled={false}
                 onSelect={setSelectedAnswer}
@@ -77,6 +108,9 @@ function QuestionCardContent({
           >
             Flip card
           </button>
+          <p className="question-card__shortcut" aria-hidden="true">
+            Tip: press 1–4 to choose an answer.
+          </p>
         </div>
       ) : (
         <div className="question-card__face question-card__face--back">
