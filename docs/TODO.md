@@ -319,7 +319,34 @@ Only checked items have been completed and verified.
 
 - [x] Lazy-load the Statistics and Settings routes with an accessible loading status.
 - [x] Verify the production build emits separate deferred route chunks and audit dependencies/assets: no unused runtime dependency or external font/image asset is currently present.
-- [ ] Phase 22 (tasks 86-89): privacy/browser checks, production build, and deployment.
+
+## Phase 22 - Release Verification and Deployment
+
+### 86. Privacy
+
+- [x] Confirm application settings, practice history, sessions, attempts, and mistake patterns use browser `localStorage`; no account or backend service is used.
+- [x] Confirm no runtime analytics, advertising, external fonts, or external image assets are included.
+- [x] Explain that clearing application/browser site data removes saved progress.
+
+### 87. Browser and Device Checks
+
+- [x] Verify the published site in current Chrome, Firefox, Edge, and Safari.
+- [x] Verify tablet and mobile layouts on a device or emulator.
+- [x] Verify keyboard, zoom, and reduced-motion behavior in a browser.
+- [x] Complete and record a slow-device check using CPU and network throttling.
+
+### 88. Production Build
+
+- [x] Run the complete automated test suite, lint, formatting check, and TypeScript/Vite production build.
+- [x] Test the local production preview, including a direct `/statistics` route response.
+
+### 89. Deployment
+
+- [x] Add the Netlify SPA rewrite rule and verify Vite copies it to `dist/_redirects`.
+- [x] Deploy `main` commit `d5bf46c` to Netlify with `npm run build` and `dist` as the publish directory.
+- [x] Confirm Netlify processed the SPA redirect rule without errors.
+- [x] Record the public deployment URL: https://majestic-mermaid-a6a8a0.netlify.app
+- [x] Verify the published site's core practice, statistics, settings, and direct-route refresh behavior.
 
 ## Agreed implementation decisions
 

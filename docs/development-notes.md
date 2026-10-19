@@ -83,3 +83,11 @@
 - Decisions: all attempt records remain available so statistics stay exact; only the rendered recent-session detail is capped at five. Statistics and mistake calculations are memoized from their stored inputs, reusable card/list rendering is memoized, and question creation remains outside ordinary renders. Statistics and Settings are lazy-loaded behind an accessible loading status. The build has no external font/image asset, and the dependency audit found every installed runtime dependency in use.
 - Tests: 5,000-attempt storage load and byte measurement; 5,000-attempt aggregate calculation; newest-five session selection; plus existing page tests updated to wait for deferred routes.
 - Verification: `node .\\node_modules\\vitest\\vitest.mjs run --pool=forks --maxWorkers=1 --no-file-parallelism` (51 passing), `npm run lint`, `npm run format:check`, and `npm run build` pass. The build emits separate deferred chunks for Settings and Statistics.
+
+## Phase 22 - Release Preparation and Netlify Deployment
+
+- Prompt focus: add the deployment-safe React Router fallback, verify the release build, and deploy from GitHub to Netlify without adding any server-side service or environment secret.
+- Decision: retain `BrowserRouter` and publish a Vite public `_redirects` file containing `/* /index.html 200`. Vite copies the file to `dist/_redirects`, allowing Netlify to serve the SPA entry document on direct application routes.
+- Verification: `npm test` completed with 14 passing files / 51 passing tests; `npm run lint`, `npm run format:check`, and `npm run build` pass. A local production preview returned HTTP 200 and the SPA entry document for `/` and `/statistics`.
+- Deployment: Netlify published `main@d5bf46c` at https://majestic-mermaid-a6a8a0.netlify.app. Its deploy report shows `dist/_redirects` uploaded and one redirect rule processed without errors.
+- Manual validation: the published practice flow, statistics, settings, direct-route refreshes, browser/device layouts, keyboard/zoom/reduced-motion behavior, and CPU/network-throttled slow-device behavior were manually checked and confirmed by the project owner. Phase 22 is complete.
