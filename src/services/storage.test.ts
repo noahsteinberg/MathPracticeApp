@@ -10,6 +10,7 @@ import {
   clearAllApplicationData,
   clearActiveSession,
   clearPracticeHistory,
+  getStorageUsageBytes,
   loadActiveSession,
   loadAttempts,
   loadMistakePatterns,
@@ -155,5 +156,20 @@ describe('storage service', () => {
     expect(clearAllApplicationData()).toBe(true)
     expect(loadSettings()).toEqual(DEFAULT_APP_SETTINGS)
     expect(loadMistakePatterns()).toEqual([])
+  })
+
+  it('loads several thousand attempts and reports application storage usage', () => {
+    const largeHistory = Array.from({ length: 5_000 }, (_, index) => ({
+      ...attempt,
+      id: `attempt-${index}`,
+      questionId: `question-${index}`,
+    }))
+    window.localStorage.setItem(
+      storageKeys.attempts,
+      JSON.stringify(largeHistory),
+    )
+
+    expect(loadAttempts()).toHaveLength(5_000)
+    expect(getStorageUsageBytes()).toBeGreaterThan(100_000)
   })
 })

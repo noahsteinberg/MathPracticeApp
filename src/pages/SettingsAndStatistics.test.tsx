@@ -17,7 +17,9 @@ describe('settings and statistics pages', () => {
     const user = userEvent.setup()
     render(<App />)
     await user.click(screen.getByRole('link', { name: 'Settings' }))
-    await user.click(screen.getByRole('checkbox', { name: 'Card animations' }))
+    await user.click(
+      await screen.findByRole('checkbox', { name: 'Card animations' }),
+    )
     await user.click(
       screen.getByRole('checkbox', { name: 'Feedback messages' }),
     )
@@ -72,7 +74,7 @@ describe('settings and statistics pages', () => {
     render(<App />)
 
     expect(
-      screen.getByRole('heading', { name: 'Statistics' }),
+      await screen.findByRole('heading', { name: 'Statistics' }),
     ).toBeInTheDocument()
     expect(screen.getByText('Overall')).toBeInTheDocument()
     expect(screen.getByText('Overall').parentElement).toHaveTextContent(
@@ -87,7 +89,7 @@ describe('settings and statistics pages', () => {
     confirm.mockRestore()
   })
 
-  it('shows active, mastered, and detailed mistake insights', () => {
+  it('shows active, mastered, and detailed mistake insights', async () => {
     saveMistakePatterns([
       {
         id: 'addition:2:3:difficulty-1',
@@ -118,7 +120,7 @@ describe('settings and statistics pages', () => {
     render(<App />)
 
     expect(
-      screen.getByRole('heading', { name: 'Mistake review insights' }),
+      await screen.findByRole('heading', { name: 'Mistake review insights' }),
     ).toBeInTheDocument()
     expect(screen.getByText('Active mistakes').parentElement).toHaveTextContent(
       '1 attempted',

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { memo, useMemo, useState } from 'react'
 import {
   clearPracticeHistory,
   loadAttempts,
@@ -6,6 +6,7 @@ import {
   loadSessions,
 } from '../services/storage'
 import { calculateMistakeStatistics } from '../services/mistakeStatistics'
+import { recentSessions } from '../services/recentSessions'
 import { accuracy, calculateStatistics } from '../services/statistics'
 import type {
   DifficultyLevel,
@@ -21,7 +22,7 @@ const operationLabels: Record<MathOperation, string> = {
   division: 'Division',
 }
 
-function StatCard({
+const StatCard = memo(function StatCard({
   label,
   attempted,
   correct,
@@ -44,24 +45,18 @@ function StatCard({
       <p>{accuracy({ attempted, correct, incorrect })}% accuracy</p>
     </article>
   )
-}
+})
 
 export function StatisticsPage() {
   const [attempts, setAttempts] = useState(loadAttempts)
   const [sessions, setSessions] = useState(loadSessions)
   const [mistakePatterns] = useState(loadMistakePatterns)
-  const statistics = calculateStatistics(attempts)
-  const mistakeStatistics = calculateMistakeStatistics(
-    mistakePatterns,
-    attempts,
+  const statistics = useMemo(() => calculateStatistics(attempts), [attempts])
+  const mistakeStatistics = useMemo(
+    () => calculateMistakeStatistics(mistakePatterns, attempts),
+    [mistakePatterns, attempts],
   )
-  const recentSessions = [...sessions]
-    .sort((left, right) =>
-      (right.completedAt ?? right.startedAt).localeCompare(
-        left.completedAt ?? left.startedAt,
-      ),
-    )
-    .slice(0, 5)
+  const recentSessionList = useMemo(() => recentSessions(sessions), [sessions])
 
   const resetStatistics = () => {
     if (
@@ -178,11 +173,11 @@ export function StatisticsPage() {
         aria-labelledby="recent-sessions-title"
       >
         <h2 id="recent-sessions-title">Recent sessions</h2>
-        {recentSessions.length === 0 ? (
+        {recentSessionList.length === 0 ? (
           <p>No completed sessions yet.</p>
         ) : (
           <ul>
-            {recentSessions.map((session) => (
+            {recentSessionList.map((session) => (
               <SessionRow key={session.id} session={session} />
             ))}
           </ul>
@@ -199,7 +194,11 @@ export function StatisticsPage() {
   )
 }
 
-function MistakeList({ patterns }: { patterns: MistakePattern[] }) {
+const MistakeList = memo(function MistakeList({
+  patterns,
+}: {
+  patterns: MistakePattern[]
+}) {
   if (patterns.length === 0) return <p>None right now.</p>
   return (
     <ul className="mistake-list">
@@ -224,7 +223,7 @@ function MistakeList({ patterns }: { patterns: MistakePattern[] }) {
       ))}
     </ul>
   )
-}
+})
 
 function SessionRow({ session }: { session: PracticeSession }) {
   const sessionAccuracy = accuracy({

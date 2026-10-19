@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import type { PracticeAttempt } from '../types/math'
 import { accuracy, calculateStatistics } from './statistics'
+import { recentSessions } from './recentSessions'
+import type { PracticeSession } from '../types/math'
 
 const attempts: PracticeAttempt[] = [
   {
@@ -51,5 +53,39 @@ describe('statistics calculations', () => {
 
   it('handles zero attempts safely', () => {
     expect(accuracy({ attempted: 0, correct: 0, incorrect: 0 })).toBe(0)
+  })
+
+  it('calculates a large history without losing aggregate totals', () => {
+    const largeHistory = Array.from({ length: 5_000 }, (_, index) => ({
+      ...attempts[index % attempts.length],
+      id: `attempt-${index}`,
+    }))
+
+    const statistics = calculateStatistics(largeHistory)
+    expect(statistics.attempted).toBe(5_000)
+    expect(statistics.correct + statistics.incorrect).toBe(5_000)
+  })
+
+  it('limits detailed recent sessions to the newest five records', () => {
+    const sessions = Array.from({ length: 8 }, (_, index) => ({
+      id: `session-${index}`,
+      operations: ['addition'],
+      difficulty: 1,
+      sessionLength: 5,
+      startedAt: `2026-01-0${index + 1}T00:00:00.000Z`,
+      completedAt: `2026-01-0${index + 1}T00:01:00.000Z`,
+      attemptedCount: 5,
+      correctCount: 5,
+      incorrectCount: 0,
+      mistakeReviewCount: 0,
+    })) satisfies PracticeSession[]
+
+    expect(recentSessions(sessions).map((session) => session.id)).toEqual([
+      'session-7',
+      'session-6',
+      'session-5',
+      'session-4',
+      'session-3',
+    ])
   })
 })

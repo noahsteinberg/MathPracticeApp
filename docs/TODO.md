@@ -301,7 +301,24 @@ Only checked items have been completed and verified.
 ### 82. Accessibility Tests
 
 - [x] Cover keyboard answer selection, semantic screen-reader announcements, reduced-motion behavior, and an automated axe audit of the application home route.
-- [ ] Phase 21 (tasks 83-85): rendering, history-size, and loading performance work.
+
+## Phase 21 - Performance and Data Management
+
+### 83. Optimize React Rendering
+
+- [x] Memoize statistics, mistake-insight, and recent-session calculations; memoize repeated statistics/list presentation.
+- [x] Keep question generation in state initialization/result handlers rather than normal render work.
+
+### 84. Manage Large Practice Histories
+
+- [x] Verify loading and aggregate calculation for 5,000 attempts, plus app-scoped local-storage usage measurement.
+- [x] Limit detailed recent-session rendering to the newest five records while retaining all attempts for exact aggregate statistics.
+- [x] Keep older attempt records because the measured test history remains manageable and archiving would reduce detail without a demonstrated storage constraint.
+
+### 85. Improve Loading Performance
+
+- [x] Lazy-load the Statistics and Settings routes with an accessible loading status.
+- [x] Verify the production build emits separate deferred route chunks and audit dependencies/assets: no unused runtime dependency or external font/image asset is currently present.
 - [ ] Phase 22 (tasks 86-89): privacy/browser checks, production build, and deployment.
 
 ## Agreed implementation decisions

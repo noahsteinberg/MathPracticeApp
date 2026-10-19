@@ -342,4 +342,18 @@ export function clearAllApplicationData(): boolean {
   ].every(remove)
 }
 
+/** Approximate UTF-16 bytes used by this application's local-storage keys. */
+export function getStorageUsageBytes(): number {
+  const storage = storageAvailable()
+  if (!storage) return 0
+  try {
+    return Object.values(keys).reduce((total, key) => {
+      const value = storage.getItem(key)
+      return total + (value === null ? 0 : (key.length + value.length) * 2)
+    }, 0)
+  } catch {
+    return 0
+  }
+}
+
 export const storageKeys = keys
