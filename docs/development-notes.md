@@ -69,3 +69,10 @@
 - Tests: storage validation/persistence/clear behavior; refresh restoration including the selected answer; saved-state clearing on completed session; and cancel/confirm behavior for navigation away from active practice.
 - Fixes: prevented the persistence effect from recreating the active record during the final completion render.
 - Verification: `node .\\node_modules\\vitest\\vitest.mjs run --pool=forks --maxWorkers=1 --no-file-parallelism` (43 passing), `npm run lint`, `npm run format:check`, and `npm run build` pass.
+
+## Phase 19-20 - Error Handling and Test Completion
+
+- Prompt focus: make invalid browser data and question generation safe, provide child-friendly recovery states, then complete the specified automated test coverage; stop before performance work.
+- Decisions: each storage category is independently sanitized or removed so valid categories survive corruption. Regular-question generation validates the full card contract, retries up to 12 times, logs development diagnostics, then returns a deterministic valid fallback. Missing summary/session states use a simple recovery panel rather than a redirect or technical error.
+- Tests: malformed JSON and category-specific storage reset; invalid generator retry/fallback; missing-summary recovery; full addition and mixed-operation flows; existing continuous, mistake-review/mastery, refresh, settings/statistics, keyboard, screen-reader, and reduced-motion tests; plus an automated axe audit. The axe test disables only color-contrast analysis because jsdom has no canvas implementation; contrast remains covered by the application CSS/accessibility work.
+- Verification: `node .\\node_modules\\vitest\\vitest.mjs run --pool=forks --maxWorkers=1 --no-file-parallelism` (48 passing), `npm run lint`, `npm run format:check`, and `npm run build` pass.

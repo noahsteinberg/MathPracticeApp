@@ -154,6 +154,10 @@ p {
   margin: 2rem auto;
   padding: 2.25rem;
 }
+.error-message {
+  max-width: 38rem;
+  text-align: center;
+}
 .setup-summary {
   background: #f5f3ff;
   border-radius: 0.8rem;

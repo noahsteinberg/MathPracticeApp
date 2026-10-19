@@ -1,6 +1,7 @@
 import { useContext, useEffect, useRef, useState } from 'react'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { QuestionCard } from '../components/practice/QuestionCard'
+import { ErrorMessage } from '../components/common/ErrorMessage'
 import { ActiveSessionContext } from '../contexts/activeSessionState'
 import { feedbackMessage } from '../services/feedback'
 import {
@@ -8,7 +9,10 @@ import {
   selectReviewPattern,
   updatePatternAfterReview,
 } from '../services/mistakeReview'
-import { createSessionQuestion } from '../services/questionGenerator'
+import {
+  createSessionQuestion,
+  isValidQuestion,
+} from '../services/questionGenerator'
 import { recordIncorrectQuestion } from '../services/mistakePatterns'
 import { generateSimilarQuestion } from '../services/similarQuestionGenerator'
 import {
@@ -57,7 +61,11 @@ function createReviewQuestion(
     difficulty: setup.difficulty,
     previousPatternId: previousQuestion?.mistakePatternId,
   })
-  return pattern ? generateSimilarQuestion(pattern) : null
+  if (!pattern) return null
+  const question = generateSimilarQuestion(pattern)
+  if (isValidQuestion(question)) return question
+  console.error('Generated an invalid mistake-review question.')
+  return null
 }
 
 export function PracticePage() {
@@ -68,7 +76,14 @@ export function PracticePage() {
   const setup = state?.setup ?? recoveredSession?.setup
 
   if (!setup || setup.operations.length === 0) {
-    return <Navigate to="/setup" replace />
+    return (
+      <ErrorMessage
+        title="We could not find a practice session."
+        message="Choose what you would like to practice, and we will make a fresh session for you."
+        actionLabel="Set up practice"
+        actionTo="/setup"
+      />
+    )
   }
 
   const noReviewPatterns =
@@ -78,7 +93,16 @@ export function PracticePage() {
       setup.operations,
       setup.difficulty,
     ).length === 0
-  if (noReviewPatterns) return <Navigate to="/setup" replace />
+  if (noReviewPatterns) {
+    return (
+      <ErrorMessage
+        title="Those practice mistakes are not available right now."
+        message="Try regular practice to build a new session, or choose a different setup."
+        actionLabel="Set up practice"
+        actionTo="/setup"
+      />
+    )
+  }
 
   return (
     <ActivePracticeSession

@@ -92,6 +92,26 @@ describe('storage service', () => {
     window.localStorage.setItem(storageKeys.attempts, '{bad json')
     expect(loadSettings()).toEqual(DEFAULT_APP_SETTINGS)
     expect(loadAttempts()).toEqual([])
+    expect(window.localStorage.getItem(storageKeys.settings)).toBeNull()
+    expect(window.localStorage.getItem(storageKeys.attempts)).toBeNull()
+  })
+
+  it('resets only malformed record categories while preserving valid data', () => {
+    saveAttempt(attempt)
+    window.localStorage.setItem(
+      storageKeys.sessions,
+      JSON.stringify([{ id: 1 }]),
+    )
+    window.localStorage.setItem(
+      storageKeys.mistakePatterns,
+      JSON.stringify([{ id: 'invalid' }]),
+    )
+
+    expect(loadAttempts()).toEqual([attempt])
+    expect(loadSessions()).toEqual([])
+    expect(loadMistakePatterns()).toEqual([])
+    expect(window.localStorage.getItem(storageKeys.sessions)).toBe('[]')
+    expect(window.localStorage.getItem(storageKeys.mistakePatterns)).toBe('[]')
   })
 
   it('persists settings, attempts, sessions, and mistake patterns', () => {

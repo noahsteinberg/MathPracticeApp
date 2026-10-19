@@ -266,8 +266,41 @@ Only checked items have been completed and verified.
 
 - [x] Warn before leaving an active session through app navigation or browser refresh/close.
 - [x] Let the learner cancel and continue, or confirm leaving to clear the recoverable session; do not warn after completion.
-- [ ] Phase 19 (tasks 76-78): invalid-data, generation-failure, and user-facing error handling.
-- [ ] Phase 20 (tasks 79-82): unit, component, integration, and accessibility testing.
+
+## Phase 19 - Error Handling
+
+### 76. Invalid Stored Data
+
+- [x] Validate settings, attempts, sessions, active sessions, and mistake patterns, resetting only an affected invalid category.
+- [x] Handle malformed JSON and unavailable/invalid records without crashing the application.
+
+### 77. Question-Generation Failures
+
+- [x] Validate generated questions, retry invalid or repeated output up to a fixed maximum, log development details, and use a safe fallback question.
+
+### 78. User-Friendly Error Messages
+
+- [x] Add a reusable non-technical recovery message with a safe route home/setup action.
+- [x] Explain missing-session and unavailable-review states without exposing technical errors.
+
+## Phase 20 - Testing
+
+### 79. Unit Tests
+
+- [x] Cover arithmetic/difficulty bounds, distractors and unique choices, statistics, mistake patterns/mastery, similar questions, and storage validation/serialization.
+- [x] Cover invalid generated-question retries and fallback behavior.
+
+### 80. Component Tests
+
+- [x] Cover setup selection, card answer/flip/result behavior, session progress/completion, statistics display, and confirmation dialogs.
+
+### 81. Integration Tests
+
+- [x] Cover full addition, mixed-operation, continuous, incorrect/mistake-pattern, review/mastery, refresh-recovery, and statistics-reset flows.
+
+### 82. Accessibility Tests
+
+- [x] Cover keyboard answer selection, semantic screen-reader announcements, reduced-motion behavior, and an automated axe audit of the application home route.
 - [ ] Phase 21 (tasks 83-85): rendering, history-size, and loading performance work.
 - [ ] Phase 22 (tasks 86-89): privacy/browser checks, production build, and deployment.
 

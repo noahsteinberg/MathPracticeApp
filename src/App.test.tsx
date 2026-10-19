@@ -46,4 +46,16 @@ describe('Phase 2 and 3 application flow', () => {
       screen.getByRole('progressbar', { name: 'Question 1 of 5' }),
     ).toBeInTheDocument()
   })
+
+  it('shows a simple recovery message when a session route has no data', () => {
+    window.history.pushState({}, '', '/summary')
+    render(<App />)
+
+    expect(
+      screen.getByRole('heading', { name: 'We could not find that session.' }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('link', { name: 'Start practice' }),
+    ).toHaveAttribute('href', '/setup')
+  })
 })

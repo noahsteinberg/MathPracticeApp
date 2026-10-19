@@ -1,4 +1,5 @@
-import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { ErrorMessage } from '../components/common/ErrorMessage'
 import type { SessionSummaryData } from '../types/math'
 
 interface SummaryLocationState {
@@ -11,7 +12,16 @@ export function SessionSummaryPage() {
   const state = location.state as SummaryLocationState | null
   const summary = state?.summary
 
-  if (!summary) return <Navigate to="/setup" replace />
+  if (!summary) {
+    return (
+      <ErrorMessage
+        title="We could not find that session."
+        message="That summary is no longer available, but your saved practice progress is safe."
+        actionLabel="Start practice"
+        actionTo="/setup"
+      />
+    )
+  }
 
   const { session, setup } = summary
   const accuracy =

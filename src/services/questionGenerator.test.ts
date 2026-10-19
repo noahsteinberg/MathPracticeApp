@@ -1,5 +1,11 @@
-import { describe, expect, it } from 'vitest'
-import { createQuestion, generateQuestion } from './questionGenerator'
+import { describe, expect, it, vi } from 'vitest'
+import type { Question } from '../types/math'
+import {
+  createQuestion,
+  createSessionQuestion,
+  generateQuestion,
+  isValidQuestion,
+} from './questionGenerator'
 
 describe('question generation', () => {
   it('creates valid questions for every operation and difficulty', () => {
@@ -52,5 +58,27 @@ describe('question generation', () => {
     expect(question.choices).toHaveLength(4)
     expect(new Set(question.choices).size).toBe(4)
     expect(question.choices).toContain(question.correctAnswer)
+  })
+
+  it('retries invalid generated questions and uses a valid fallback', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    const invalidQuestion = {
+      ...createQuestion('addition', 1),
+      choices: [1, 1, 1, 1],
+    } satisfies Question
+    const createInvalidQuestion = vi.fn(() => invalidQuestion)
+
+    const question = createSessionQuestion(
+      ['addition'],
+      1,
+      undefined,
+      createInvalidQuestion,
+    )
+
+    expect(createInvalidQuestion).toHaveBeenCalledTimes(12)
+    expect(isValidQuestion(question)).toBe(true)
+    expect(question.operation).toBe('addition')
+    expect(error).toHaveBeenCalled()
+    error.mockRestore()
   })
 })

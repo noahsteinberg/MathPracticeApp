@@ -12,6 +12,7 @@ import {
 
 async function startFixedSession(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('link', { name: 'Start practice' }))
+  await user.click(screen.getByRole('button', { name: 'Clear selection' }))
   await user.click(screen.getByLabelText('Addition'))
   await user.click(screen.getByLabelText('Level 1: Beginner'))
   await user.click(screen.getByLabelText('5 questions'))
@@ -206,6 +207,23 @@ describe('practice sessions', () => {
     ).toBeInTheDocument()
     expect(loadActiveSession()).toBeNull()
     confirm.mockRestore()
+  })
+
+  it('starts a mixed-operation session with every selected operation', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByRole('link', { name: 'Start practice' }))
+    await user.click(screen.getByRole('button', { name: 'Clear selection' }))
+    await user.click(screen.getByLabelText('Addition'))
+    await user.click(screen.getByLabelText('Multiplication'))
+    await user.click(screen.getByLabelText('Level 2: Easy'))
+    await user.click(screen.getByLabelText('5 questions'))
+    await user.click(screen.getByRole('button', { name: 'Start practice' }))
+
+    expect(loadActiveSession()?.setup.operations).toEqual([
+      'addition',
+      'multiplication',
+    ])
   })
 
   it('disables mistake review until an active pattern exists', async () => {

@@ -7,6 +7,14 @@ interface Operands {
   secondOperand: number
 }
 
+const validOperations: MathOperation[] = [
+  'addition',
+  'subtraction',
+  'multiplication',
+  'division',
+]
+const MAX_GENERATION_ATTEMPTS = 12
+
 function maxOperandForDifficulty(difficulty: DifficultyLevel): number {
   return [10, 50, 100, 1000][difficulty - 1]
 }
@@ -118,6 +126,64 @@ export function createQuestion(
   return addAnswerChoices(generateQuestion(operation, difficulty))
 }
 
+/** Verifies the arithmetic and answer-card contract before a question reaches the UI. */
+export function isValidQuestion(question: Question): boolean {
+  const choicesAreUnique = new Set(question.choices).size === 4
+  const arithmeticAnswer = calculateAnswer(
+    question.operation,
+    question.firstOperand,
+    question.secondOperand,
+  )
+  return (
+    validOperations.includes(question.operation) &&
+    Number.isInteger(question.firstOperand) &&
+    Number.isInteger(question.secondOperand) &&
+    Number.isInteger(question.correctAnswer) &&
+    Number.isFinite(question.correctAnswer) &&
+    (question.operation !== 'division' || question.secondOperand !== 0) &&
+    question.correctAnswer === arithmeticAnswer &&
+    question.choices.length === 4 &&
+    choicesAreUnique &&
+    question.choices.every((choice) => Number.isInteger(choice)) &&
+    question.choices.includes(question.correctAnswer)
+  )
+}
+
+function fallbackOperands(operation: MathOperation): Operands {
+  switch (operation) {
+    case 'addition':
+      return { firstOperand: 1, secondOperand: 1 }
+    case 'subtraction':
+      return { firstOperand: 2, secondOperand: 1 }
+    case 'multiplication':
+      return { firstOperand: 2, secondOperand: 2 }
+    case 'division':
+      return { firstOperand: 4, secondOperand: 2 }
+  }
+}
+
+export function createFallbackQuestion(
+  operation: MathOperation,
+  difficulty: DifficultyLevel,
+): Question {
+  const operands = fallbackOperands(operation)
+  const correctAnswer = calculateAnswer(
+    operation,
+    operands.firstOperand,
+    operands.secondOperand,
+  )
+  return addAnswerChoices({
+    id: crypto.randomUUID(),
+    operation,
+    ...operands,
+    displayText: `${operands.firstOperand} ${operationSymbol(operation)} ${operands.secondOperand} = ?`,
+    correctAnswer,
+    choices: [],
+    difficulty,
+    source: 'regular',
+  })
+}
+
 function questionSignature(question: Question): string {
   return `${question.operation}:${question.firstOperand}:${question.secondOperand}`
 }
@@ -126,15 +192,41 @@ export function createSessionQuestion(
   operations: MathOperation[],
   difficulty: DifficultyLevel,
   previousQuestion?: Question,
+  createCandidate: (
+    operation: MathOperation,
+    difficulty: DifficultyLevel,
+  ) => Question = createQuestion,
 ): Question {
+  const selectedOperations = operations.filter((operation) =>
+    validOperations.includes(operation),
+  )
+  const fallbackOperation = selectedOperations[0] ?? 'addition'
   const previousSignature =
     previousQuestion && questionSignature(previousQuestion)
 
-  for (let attempt = 0; attempt < 12; attempt += 1) {
-    const operation = operations[Math.floor(Math.random() * operations.length)]
-    const question = createQuestion(operation, difficulty)
-    if (questionSignature(question) !== previousSignature) return question
+  for (let attempt = 0; attempt < MAX_GENERATION_ATTEMPTS; attempt += 1) {
+    const operation =
+      selectedOperations[
+        Math.floor(Math.random() * selectedOperations.length)
+      ] ?? fallbackOperation
+    try {
+      const question = createCandidate(operation, difficulty)
+      if (
+        isValidQuestion(question) &&
+        questionSignature(question) !== previousSignature
+      ) {
+        return question
+      }
+      console.error(
+        'Generated an invalid or repeated practice question; retrying.',
+      )
+    } catch (error) {
+      console.error('Question generation failed; retrying.', error)
+    }
   }
 
-  return createQuestion(operations[0], difficulty)
+  console.error(
+    'Using a safe fallback question after generation retries failed.',
+  )
+  return createFallbackQuestion(fallbackOperation, difficulty)
 }

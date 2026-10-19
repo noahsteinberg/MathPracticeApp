@@ -70,6 +70,30 @@ function remove(key: string): boolean {
   }
 }
 
+function hasStoredValue(key: string): boolean {
+  const storage = storageAvailable()
+  if (!storage) return false
+  try {
+    return storage.getItem(key) !== null
+  } catch {
+    return false
+  }
+}
+
+function loadValidatedList<T>(
+  key: string,
+  isValid: (value: unknown) => value is T,
+): T[] {
+  const saved = readJson<unknown>(key)
+  if (!Array.isArray(saved)) {
+    if (hasStoredValue(key)) remove(key)
+    return []
+  }
+  const validValues = saved.filter(isValid)
+  if (validValues.length !== saved.length) writeJson(key, validValues)
+  return validValues
+}
+
 function isDifficulty(value: unknown): value is DifficultyLevel {
   return value === 1 || value === 2 || value === 3 || value === 4
 }
@@ -199,10 +223,13 @@ export function initializeStorage(): void {
 
 export function loadSettings(): AppSettings {
   initializeStorage()
-  const saved = readJson<Partial<AppSettings>>(keys.settings)
-  if (!isObject(saved)) return { ...DEFAULT_APP_SETTINGS }
+  const saved = readJson<unknown>(keys.settings)
+  if (!isObject(saved)) {
+    if (hasStoredValue(keys.settings)) remove(keys.settings)
+    return { ...DEFAULT_APP_SETTINGS }
+  }
 
-  return {
+  const settings: AppSettings = {
     soundEffectsEnabled:
       typeof saved.soundEffectsEnabled === 'boolean'
         ? saved.soundEffectsEnabled
@@ -236,6 +263,10 @@ export function loadSettings(): AppSettings {
         ? saved.masteryThreshold
         : DEFAULT_APP_SETTINGS.masteryThreshold,
   }
+  if (JSON.stringify(saved) !== JSON.stringify(settings)) {
+    writeJson(keys.settings, settings)
+  }
+  return settings
 }
 
 export function saveSettings(settings: AppSettings): boolean {
@@ -245,8 +276,7 @@ export function saveSettings(settings: AppSettings): boolean {
 
 export function loadAttempts(): PracticeAttempt[] {
   initializeStorage()
-  const saved = readJson<unknown[]>(keys.attempts)
-  return Array.isArray(saved) ? saved.filter(isAttempt) : []
+  return loadValidatedList(keys.attempts, isAttempt)
 }
 
 export function saveAttempt(attempt: PracticeAttempt): boolean {
@@ -255,8 +285,7 @@ export function saveAttempt(attempt: PracticeAttempt): boolean {
 
 export function loadSessions(): PracticeSession[] {
   initializeStorage()
-  const saved = readJson<unknown[]>(keys.sessions)
-  return Array.isArray(saved) ? saved.filter(isSession) : []
+  return loadValidatedList(keys.sessions, isSession)
 }
 
 export function saveSession(session: PracticeSession): boolean {
@@ -270,7 +299,9 @@ export function saveSession(session: PracticeSession): boolean {
 export function loadActiveSession(): ActivePracticeSession | null {
   initializeStorage()
   const saved = readJson<unknown>(keys.activeSession)
-  return isActivePracticeSession(saved) ? saved : null
+  if (isActivePracticeSession(saved)) return saved
+  if (hasStoredValue(keys.activeSession)) remove(keys.activeSession)
+  return null
 }
 
 export function saveActiveSession(
@@ -286,8 +317,7 @@ export function clearActiveSession(): boolean {
 
 export function loadMistakePatterns(): MistakePattern[] {
   initializeStorage()
-  const saved = readJson<unknown[]>(keys.mistakePatterns)
-  return Array.isArray(saved) ? saved.filter(isMistakePattern) : []
+  return loadValidatedList(keys.mistakePatterns, isMistakePattern)
 }
 
 export function saveMistakePatterns(patterns: MistakePattern[]): boolean {
