@@ -18,9 +18,13 @@ describe('settings and statistics pages', () => {
     render(<App />)
     await user.click(screen.getByRole('link', { name: 'Settings' }))
     await user.click(screen.getByRole('checkbox', { name: 'Card animations' }))
+    await user.click(
+      screen.getByRole('checkbox', { name: 'Feedback messages' }),
+    )
     await user.selectOptions(screen.getByLabelText('Default difficulty'), '4')
     expect(loadSettings()).toMatchObject({
       cardAnimationsEnabled: false,
+      feedbackEffectsEnabled: false,
       defaultDifficulty: 4,
     })
 

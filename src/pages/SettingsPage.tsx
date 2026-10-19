@@ -91,6 +91,15 @@ export function SettingsPage() {
           }
         />
         <Toggle
+          label="Feedback messages"
+          checked={settings.feedbackEffectsEnabled}
+          onChange={() =>
+            updateSettings({
+              feedbackEffectsEnabled: !settings.feedbackEffectsEnabled,
+            })
+          }
+        />
+        <Toggle
           label="Show explanations"
           checked={settings.showExplanations}
           onChange={() =>

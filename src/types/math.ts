@@ -79,6 +79,7 @@ export interface MistakePattern {
 export interface AppSettings {
   soundEffectsEnabled: boolean
   cardAnimationsEnabled: boolean
+  feedbackEffectsEnabled: boolean
   showExplanations: boolean
   defaultSessionLength: SessionLength
   defaultDifficulty: DifficultyLevel
@@ -89,6 +90,7 @@ export interface AppSettings {
 export const DEFAULT_APP_SETTINGS: AppSettings = {
   soundEffectsEnabled: true,
   cardAnimationsEnabled: true,
+  feedbackEffectsEnabled: true,
   showExplanations: true,
   defaultSessionLength: 10,
   defaultDifficulty: 2,

@@ -234,7 +234,26 @@ Only checked items have been completed and verified.
 - [x] Add a text selected-state indicator so selection is not communicated by color alone.
 - [x] Keep text in scalable `rem`/`clamp` units and layouts fluid for 200% zoom and larger system font sizes.
 
-- [ ] Phase 17 (tasks 70-73): tablet/mobile/statistics responsive design and child-friendly feedback.
+## Phase 17 - Responsive Design and Polish
+
+### 70. Tablet Layout
+
+- [x] Keep practice content centered with large, easy-to-reach answer targets at tablet widths.
+- [x] Add responsive tablet spacing and card sizing for portrait and landscape layouts.
+
+### 71. Mobile Layout
+
+- [x] Stack answer choices and summary actions on small screens, with fluid card widths and no horizontal page scrolling.
+- [x] Keep mobile navigation, progress, and question text usable at narrow viewport widths.
+
+### 72. Statistics Responsiveness
+
+- [x] Stack statistics cards on small screens and preserve readable recent-session and mistake-detail content without overlap.
+
+### 73. Child-Friendly Feedback
+
+- [x] Show varied, positive feedback after a self-reported correct answer and supportive, non-shaming feedback after a mistake.
+- [x] Persist a setting that lets learners turn feedback messages off.
 - [ ] Phase 18 (tasks 74-75): active-session recovery and navigation safety.
 - [ ] Phase 19 (tasks 76-78): invalid-data, generation-failure, and user-facing error handling.
 - [ ] Phase 20 (tasks 79-82): unit, component, integration, and accessibility testing.

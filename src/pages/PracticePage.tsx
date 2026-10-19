@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { QuestionCard } from '../components/practice/QuestionCard'
+import { feedbackMessage } from '../services/feedback'
 import {
   activeMistakePatterns,
   selectReviewPattern,
@@ -92,6 +93,7 @@ function ActivePracticeSession({
   onComplete,
 }: ActivePracticeSessionProps) {
   const [session, setSession] = useState(() => createSession(setup))
+  const [feedback, setFeedback] = useState<string | null>(null)
   const [question, setQuestion] = useState<Question>(() =>
     setup.reviewMode === 'mistake-review'
       ? (createReviewQuestion(setup) ??
@@ -120,6 +122,7 @@ function ActivePracticeSession({
     selectedAnswer: number
     selfReportedCorrect: boolean
   }) => {
+    const settings = loadSettings()
     const updatedSession: PracticeSession = {
       ...session,
       attemptedCount: session.attemptedCount + 1,
@@ -148,6 +151,11 @@ function ActivePracticeSession({
     }
     setAttempts((currentAttempts) => [...currentAttempts, attempt])
     saveAttempt(attempt)
+    setFeedback(
+      settings.feedbackEffectsEnabled
+        ? feedbackMessage(selfReportedCorrect)
+        : null,
+    )
     if (!selfReportedCorrect && question.source === 'regular') {
       recordIncorrectQuestion(question)
     }
@@ -156,7 +164,7 @@ function ActivePracticeSession({
         loadMistakePatterns(),
         question.mistakePatternId,
         selfReportedCorrect,
-        loadSettings().masteryThreshold,
+        settings.masteryThreshold,
       )
       saveMistakePatterns(updatedPatterns)
     }
@@ -233,6 +241,11 @@ function ActivePracticeSession({
           />
         )}
       </div>
+      {feedback && (
+        <p className="practice-feedback" role="status" aria-live="polite">
+          {feedback}
+        </p>
+      )}
       <QuestionCard
         question={question}
         animationsEnabled={loadSettings().cardAnimationsEnabled}

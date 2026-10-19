@@ -53,3 +53,11 @@
 - Tests: number-key selection, editable-input shortcut protection, selected-state text, screen-reader question/reveal announcements, reduced-motion class behavior, and session-progress announcement coverage.
 - Fixes: restored a click in one existing card test after jsdom did not emulate native focused-button Enter activation; browser-native button semantics remain unchanged.
 - Verification: `npm test` (37 passing), `npm run lint`, `npm run format:check`, and `npm run build` all pass.
+
+## Phase 17 - Responsive Design and Polish
+
+- Prompt focus: implement tablet/mobile/statistics responsiveness and child-friendly feedback only; stop before active-session recovery.
+- Decisions: responsive rules use 600px and 900px breakpoints, preserve a 320px minimum viewport, and stack dense actions/content at the narrowest widths. Feedback follows the existing self-reported outcome model, is deliberately brief and non-shaming, varies from a small message set, and can be disabled through persisted settings.
+- Tests: deterministic positive/supportive feedback-message selection; correct and incorrect practice-result feedback; feedback-setting persistence and disabled-message behavior; existing session, statistics, and settings coverage remains in the suite.
+- Fixes: added overflow-safe wrapping for long history/detail text and full-width narrow-screen controls to prevent layout spillover.
+- Verification: `node .\\node_modules\\vitest\\vitest.mjs run --pool=forks --maxWorkers=1 --no-file-parallelism` (40 passing), `npm run lint`, `npm run format:check`, and `npm run build` pass. The serialized Vitest invocation avoids an intermittent local worker-startup timeout from the npm wrapper.

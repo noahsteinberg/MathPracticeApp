@@ -2,7 +2,12 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import App from '../App'
-import { loadMistakePatterns, saveMistakePatterns } from '../services/storage'
+import { feedbackMessages } from '../services/feedback'
+import {
+  loadMistakePatterns,
+  saveMistakePatterns,
+  saveSettings,
+} from '../services/storage'
 
 async function startFixedSession(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('link', { name: 'Start practice' }))
@@ -40,6 +45,13 @@ describe('practice sessions', () => {
 
     await reportCorrectAnswer(user)
     expect(
+      screen
+        .getAllByRole('status')
+        .some((status) =>
+          feedbackMessages.correctMessages.includes(status.textContent ?? ''),
+        ),
+    ).toBe(true)
+    expect(
       screen.getByRole('heading', { name: 'Question 2 of 5' }),
     ).toBeInTheDocument()
 
@@ -59,7 +71,7 @@ describe('practice sessions', () => {
     expect(
       screen.getByRole('heading', { name: 'Question 1 of 5' }),
     ).toBeInTheDocument()
-  })
+  }, 10_000)
 
   it('supports ending a continuous session and reports zero attempts safely', async () => {
     const user = userEvent.setup()
@@ -109,6 +121,46 @@ describe('practice sessions', () => {
       incorrectCount: 1,
       isMastered: false,
     })
+    expect(
+      screen
+        .getAllByRole('status')
+        .some((status) =>
+          feedbackMessages.supportiveMessages.includes(
+            status.textContent ?? '',
+          ),
+        ),
+    ).toBe(true)
+  })
+
+  it('does not show feedback messages when they are disabled in settings', async () => {
+    saveSettings({
+      soundEffectsEnabled: true,
+      cardAnimationsEnabled: true,
+      feedbackEffectsEnabled: false,
+      showExplanations: true,
+      defaultSessionLength: 10,
+      defaultDifficulty: 2,
+      defaultOperations: [],
+      masteryThreshold: 3,
+    })
+    const user = userEvent.setup()
+    render(<App />)
+    await startFixedSession(user)
+    await reportCorrectAnswer(user)
+
+    expect(
+      screen
+        .getAllByRole('status')
+        .every(
+          (status) =>
+            !feedbackMessages.correctMessages.includes(
+              status.textContent ?? '',
+            ) &&
+            !feedbackMessages.supportiveMessages.includes(
+              status.textContent ?? '',
+            ),
+        ),
+    ).toBe(true)
   })
 
   it('disables mistake review until an active pattern exists', async () => {

@@ -159,6 +159,10 @@ export function loadSettings(): AppSettings {
       typeof saved.cardAnimationsEnabled === 'boolean'
         ? saved.cardAnimationsEnabled
         : DEFAULT_APP_SETTINGS.cardAnimationsEnabled,
+    feedbackEffectsEnabled:
+      typeof saved.feedbackEffectsEnabled === 'boolean'
+        ? saved.feedbackEffectsEnabled
+        : DEFAULT_APP_SETTINGS.feedbackEffectsEnabled,
     showExplanations:
       typeof saved.showExplanations === 'boolean'
         ? saved.showExplanations
